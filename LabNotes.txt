@@ -1,0 +1,6 @@
+01/06/15
+I didn't do this yesterday, so I'll start today
+
+Yesterday, I was able to run the vrecon (specifically vrecon_w) code on the lab computers for a dataset of Jacob's. The dataset that I ran can be found in: /projects/souris/jacob/fid/29jul14.fid
+
+I ran vrecon to get the datafiles split with respect to brain and gradient direction - this should make the analysis a bit easier. The notion is that we can easily play with these datasets to our heart's content, and then simply run them through an FFT algorithm to obtain the images that we are looking for. In addition, MATLAB should be able to write the ``data-altered" files to a very similar minc file, making the output similar to what we use in the lab. 
