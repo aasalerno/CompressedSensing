@@ -1,9 +1,8 @@
-function testline(data,slp)
+function testline(data,slp,sampFac)
 %data = rand(200,200);
 s = size(data);
 %slp = 0;
 [x,y] = meshgrid(linspace(-1,1,s(1)),linspace(-1,1,s(2)));
-sampFac = 0.5;
 wid = 0.5*sampFac;
 
 if ~isnan(slp)
