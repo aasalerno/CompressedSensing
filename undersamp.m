@@ -75,14 +75,16 @@ graddir = load('GradientVector.txt');
 graddir = [graddir(:,loc(1)) graddir(:,loc(2)) graddir(:,loc(3))];
 
 % Get which gradient we're working with by Splitting the name
-nameSpl = strsplit(filename);
+nameSpl = strsplit(filename,'.');
 gradvec = graddir(round(str2num(nameSpl{end-1})),:); % Get the gradient vector so we know which one we need
 
 if gradvec > 30
     disp('No gradient. Do not undersample');
 else
     readloc = find(ismember(dim,rodir)); % This tells us which dimension the readout is on for our dataset, i.e. 1, 2, or 3
-    gradvec = find(~ismember(gradvec,gradvec(readloc))); % Gives us only the values for the non readout direction
+    tester = 1:3;
+    tester = find(~ismember(tester,readloc));
+    gradvec = gradvec(tester); % Gives us only the values for the non readout direction
     % Quick and dirty way
     % to do a projection
     
@@ -97,28 +99,32 @@ else
     
     if readloc == 1
         slicesz = ones(n(2),n(3)); %What is the size of each slice
-        filt = testline(slicesz,slp); % Make the filter that we will use
-        
+        filt = testline(slicesz,slp,sampFac); % Make the filter that we will use
+        filt = uint16(filt);
         for i = 1:n(1)
             data(i,:,:) = reshape(filt,size(rawdata(i,:,:))).*rawdata(i,:,:); % Applies the filter to each "slice"
         end
     elseif readloc == 2
         slicesz = ones(n(1),n(3)); %What is the size of each slice
-        filt = testline(slicesz,slp); % Make the filter that we will use
+        filt = testline(slicesz,slp,sampFac); % Make the filter that we will use
+        filt = uint16(filt);
         
         for i = 1:n(2)
             data(:,i,:) = reshape(filt,size(rawdata(:,i,:))).*rawdata(:,i,:); % Applies the filter to each "slice"
         end
     elseif readloc == 3
         slicesz = ones(n(1),n(2)); %What is the size of each slice
-        filt = testline(slicesz,slp); % Make the filter that we will use
+        filt = testline(slicesz,slp,sampFac); % Make the filter that we will use
+        filt = uint16(filt);
         
         for i = 1:n(3)
             data(:,:,i) = reshape(filt,size(rawdata(:,:,i))).*rawdata(:,:,i); % Applies the filter to each "slice"
         end
     end
     
-    
+% In order to have this work properly, we need to make a copy of the original file to the output file, then change the data that we so choose
+    copyfile(filename,outname);
+    h5write(outname,'/minc-2.0/image/0/image',data);
     
 end
 
