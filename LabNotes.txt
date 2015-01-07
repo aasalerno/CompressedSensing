@@ -23,4 +23,10 @@ data  = h5read(filename,'/minc-2.0/image/0/image') %'/minc-2.0/image/0/image' is
 
 3:00PM - Beginning to write a function to handle the zero-filling
 The notion of what the function will do is in the function information (i.e. comments right under the name.) In addition, this will be done on GitHub in order to have version control!
-The first copy of this code is going to be a brute force method to write it, which can be cleaned up later on. As a side note, I am currently unsure as to whether or not the gradient information is held within the minc file. If it is, the code can be made much more robust, as it won't rely on an external txt file that I wrote with all of the gradient values written (in their 3 decimal point approximation - given to me by Jacob, from a paper).
+The first copy of this code is going to be a brute force method to write it, which can be cleaned up later on. As a side note, I am currently unsure as to whether or not the gradient information is held within the minc file. If it is, the code can be made much more robust, as it won't rely on an external txt file that I wrote with all of the gradient values written (in their 3 decimal point approximation - given to me by Jacob, from a paper). 
+
+10:33PM
+Having some troubles with the code, some unusual errors are popping up, but I'm trying to solve them as I go along. One of them came from meshgrid, and how it handles certain things, that was fixed relatively easily though. My most recent error is this "Error using  .* Integers can only be combined with integers of the same class, or scalar doubles." So, it looks like I'll need to figure out either the class of the data that I'm working with, or just have it go to a scalar double. 
+
+11:46PM 
+The only thing left to do would be to possibly make this code functional, and thus allow it to run over an extended period of time on the computers at work. The only issue that could arise with this is the fact that they do not have MATLAB installed on them. A possible fix would be to bring my hard drive and run everything through that - though I hope formatting it won't be necessary. The size of the data files may be a problem for a USB.
