@@ -1,6 +1,26 @@
 01/06/15
-I didn't do this yesterday, so I'll start today
-
+YESTERDAY
 Yesterday, I was able to run the vrecon (specifically vrecon_w) code on the lab computers for a dataset of Jacob's. The dataset that I ran can be found in: /projects/souris/jacob/fid/29jul14.fid
 
 I ran vrecon to get the datafiles split with respect to brain and gradient direction - this should make the analysis a bit easier. The notion is that we can easily play with these datasets to our heart's content, and then simply run them through an FFT algorithm to obtain the images that we are looking for. In addition, MATLAB should be able to write the ``data-altered" files to a very similar minc file, making the output similar to what we use in the lab. 
+
+
+TODAY
+As per Jacob, I may have made a decent mistake. The notion is that we should actually run the vrecon using the tag -rawfloat as this can help us out later. Jacob has some code already written that can handle the data in this way, so it may be beneficial to do it this way.
+
+12:55PM - Monitor and Disown
+I am monitoring the progress of the redo of vrecon, as I made yet another mistake. Once this is completed, I will begin with the proper vrecon. Since I am running this over PuTTY, I need to disown the jobs in order to be assured that they complete. The way I plan on doing this is by appending "&" to the end, then "jobs", then "disown", then "jobs" as a check. Information can be found here (http://serverfault.com/questions/311593/keeping-a-linux-process-running-after-i-logout)
+
+1:55PM - RAW test and MINC searching
+It finished. I'm looking at a .raw file now in MATLAB. First, I'm checking if MATLAB can even open the file. If it can't, we're in a bit of hot water. The important data is deemingly extremely difficult to locate in the minc structures, however, if I can do that, this may be a better way to go. Upon looking at Jacob's code, he seems to just pt it through a second recon that ends up converting the data into minc.
+Matlab seems to want to crash when using uiopen to open the .RAW files, and thus, fopen may be a better option. 
+
+2:50PM - Update for MINC searching - SUCCESS!
+MNC files can be readily read into MATLAB as long as you know what you're looking for and where it is.
+By using H5INFO in accordance with H5READ, I was able to find exactly what I was looking for -- the data. The data is buried in the file. If we assume that `info' is a variable that has all of the information of the file that we need, at location `filename', then in MATLAB, it looks like:
+info = h5info(filename); % We use this in order to look for the different pieces of the information that we need. In a 			   perfectly replicatable system, this only needs to be done once
+data  = h5read(filename,'/minc-2.0/image/0/image') %'/minc-2.0/image/0/image' is where the image data is seemingly held
+
+3:00PM - Beginning to write a function to handle the zero-filling
+The notion of what the function will do is in the function information (i.e. comments right under the name.) In addition, this will be done on GitHub in order to have version control!
+The first copy of this code is going to be a brute force method to write it, which can be cleaned up later on. As a side note, I am currently unsure as to whether or not the gradient information is held within the minc file. If it is, the code can be made much more robust, as it won't rely on an external txt file that I wrote with all of the gradient values written (in their 3 decimal point approximation - given to me by Jacob, from a paper).
