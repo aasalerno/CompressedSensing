@@ -41,6 +41,7 @@ if nargin < 4
 end
 
 rawdata = h5read(filename,'/minc-2.0/image/0/image'); % This gives us the dataset
+data = zeros(size(rawdata)); % Preallocate memory for speed.
 
 % A little bit of work to make sure that we have the correct order for the
 % dimensions
@@ -75,7 +76,7 @@ graddir = [graddir(:,loc(1)) graddir(:,loc(2)) graddir(:,loc(3))];
 
 % Get which gradient we're working with by Splitting the name
 nameSpl = strsplit(filename);
-gradvec = graddir(str2num(nameSpl{end-1}),:); % Get the gradient vector so we know which one we need
+gradvec = graddir(round(str2num(nameSpl{end-1})),:); % Get the gradient vector so we know which one we need
 
 if gradvec > 30
     disp('No gradient. Do not undersample');
@@ -99,7 +100,21 @@ else
         filt = testline(slicesz,slp); % Make the filter that we will use
         
         for i = 1:n(1)
-            data(i,:,:) = reshape(filt,size(rawdata(i,:,:))).*rawdata(i,:,:);
+            data(i,:,:) = reshape(filt,size(rawdata(i,:,:))).*rawdata(i,:,:); % Applies the filter to each "slice"
+        end
+    elseif readloc == 2
+        slicesz = ones(n(1),n(3)); %What is the size of each slice
+        filt = testline(slicesz,slp); % Make the filter that we will use
+        
+        for i = 1:n(2)
+            data(:,i,:) = reshape(filt,size(rawdata(:,i,:))).*rawdata(:,i,:); % Applies the filter to each "slice"
+        end
+    elseif readloc == 3
+        slicesz = ones(n(1),n(2)); %What is the size of each slice
+        filt = testline(slicesz,slp); % Make the filter that we will use
+        
+        for i = 1:n(3)
+            data(:,:,i) = reshape(filt,size(rawdata(:,:,i))).*rawdata(:,:,i); % Applies the filter to each "slice"
         end
     end
     
