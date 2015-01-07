@@ -45,8 +45,7 @@ data = zeros(size(rawdata)); % Preallocate memory for speed.
 
 % A little bit of work to make sure that we have the correct order for the
 % dimensions
-dimorder = h5readatt('C:\Users\saler_000\Documents\raw\real\RealImgRaw.2.1.mnc',...
-    '/minc-2.0/image/0/image','dimorder'); %Dimension order
+dimorder = h5readatt(filename,'/minc-2.0/image/0/image','dimorder'); %Dimension order
 dimorder = strsplit(dimorder,',');
 
 for i = 1:length(dimorder)
