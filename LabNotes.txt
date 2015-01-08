@@ -38,5 +38,40 @@ Meeting with Brian
 - Ask Jacob about the dimensionality of how he does his scans - make sure that we are doing the analysis using the gradient vector correctly
 - For this first experiment, given the readout gradient, we can use a circle to match the size of the strip for the other readout directions
 - Make sure that it can read back the data that we have written out using H5READ
-- Want to compare the unfiltered data from MATLAB and the filtered data to see, as well as what the full dataset from MATLAB looks like in comparison to vrecon
+- Want to compare the unfiltered data from MATLAB and the filtered data to see differences, as well as what the full dataset from MATLAB looks like in comparison to vrecon. Here, we are trying to make sure that we don't have any differences from how the data is stored in the mnc file!
+
 - We need a comparison of other no CS undersampling techniques. Parallel to GD, lo-res and perpendicular
+
+
+01/08/15
+Post Meeting Analysis - Answering the notes from 01/07/15
+-------------------------------------------------------------
+- Ask Jacob about the dimensionality of how he does his scans - make sure that we are doing the analysis using the gradient vector:
+	- Jacob said that it is set up such that Gx is Phase Encode (PE), Gy is ReadOut (RO), and Gz is SLice (SL)
+	- The question now is, what does this mean with respect to the code? 
+- For this first experiment, given the readout gradient, we can use a circle to match the size of the strip for the other readout directions
+	- This will be added to the MATLAB code, see GitHub for details (https://github.com/aasalerno/CompressedSensing)
+- Make sure that it can read back the data that we have written out using H5READ
+	- Testing this as of 1:09PM 
+	- How it is done:
+		- Read in a dataset
+		- Copy a file with *different data* to a different location
+		- Save the data from the first file to the data location of the second file
+		- Read in the data from the second file
+		- Compare it to the data from the first file - it should be identical
+`	- The code that was used is as follows:
+                b = h5read('C:\Users\saler_000\Documents\raw\real\RealImgRaw.2.1.mnc','/minc-2.0/image/0/image');
+                copyfile('C:\Users\saler_000\Documents\raw\real\RealImgRaw.2.2.mnc','test.mnc');
+                h5write('test.mnc','/minc-2.0/image/0/image',b);
+                b1 = h5read('test.mnc','/minc-2.0/image/0/image');
+                b1 == b;
+                a = ans;
+                test1 = prod(size(a)); % Tells us the size of a (i.e. how many 1's we should have)
+                test2 = sum(a(:));
+		test1 == test2 % If this gives 1, we're good!
+	- Using this, we get the value that we expect.		 
+- Want to compare the unfiltered data from MATLAB and the filtered data to see the differences that exist, as well as what the full dataset from MATLAB looks like in comparison to vrecon. Here, we are trying to make sure that we don't have any differences from how the data is stored in the mnc file!
+- We need a comparison of other no CS undersampling techniques. Parallel to GD, lo-res and perpendicular
+	- Will change the way that the filter is done, see GitHub for details (https://github.com/aasalerno/CompressedSensing)
+	- Likely will do it in such a way that we can effortlessly change the filter between different scans for the greatest simplicity
+
