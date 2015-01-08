@@ -1,4 +1,4 @@
-function undersamp(filename,outname,sampFac,rodir)
+function undersamp(filename,outname,sampFac,gvdir)
 % This function is made to pseudoundersample a dataset as we wish to do
 % so.
 %
@@ -23,11 +23,14 @@ function undersamp(filename,outname,sampFac,rodir)
 % outname - The output filename (string)
 %         - This data will effectively be the input file with the data
 %         changed - that is, undersampled
-% rodir - readout direction (string)
+% sampFac - The undersampling factor, generally 0.5
+% gvdir - readout direction (string)
 %       - The point of this data is to effectively make sure that we are
 %       not messing up the data that we are looking at.
 %       - As per Jacob, the general readout direction is 'y' for exvivo
 %       scans
+%       - Edited such that now we are going to include all of them,
+%       ro,pe,sl
 %
 %
 % Anthony Salerno                       01/06/15
@@ -37,37 +40,58 @@ if nargin < 3
 end
 
 if nargin < 4
-    rodir = 'y';
+    gvdir = {'dpe' 'dro' 'dsl'}; % This assumes an order of PE, RO, SL as per the grad vec file
+                                 % However, if the order is different, which we
+                                 % will check for, it will be changed.
 end
 
 rawdata = h5read(filename,'/minc-2.0/image/0/image'); % This gives us the dataset
 data = zeros(size(rawdata)); % Preallocate memory for speed.
 
-% A little bit of work to make sure that we have the correct order for the
-% dimensions
-dimorder = h5readatt(filename,'/minc-2.0/image/0/image','dimorder'); %Dimension order
-dimorder = strsplit(dimorder,',');
-
-for i = 1:length(dimorder)
-    a = dimorder{i};
-    dim{i} = a(1);
-    clear a
-end
-clear dimorder
-% Now we look at the order and see how we have to change around our
-% gradient directions so that they match!
+% Double check to make sure that the order is RO, PE, SL
+check = h5readatt(filename,'/minc-2.0/info/vnmr','array');
+check = check(2:end-2); % This gets rid of the brackets at the beginning and end
+check = strsplit(check,',');
 loc = zeros(1,3);
 for i=1:3
-    if dim{i} == 'x'
+    if check{i} == gvdir{1}
         loc(i) = 1;
-    elseif dim{i} == 'y'
+    elseif check{i} == gvdir{2}
         loc(i) = 2;
-    elseif dim{i} == 'z'
+    elseif check{i} == gvdir{3}
         loc(i) = 3;
     else
         error('Problem with your dimorder. Check file')
     end
 end
+
+
+% OLD METHOD USING DIMORDER
+% % A little bit of work to make sure that we have the correct order for the
+% % dimensions
+% dimorder = h5readatt(filename,'/minc-2.0/image/0/image','dimorder'); %Dimension order
+% dimorder = strsplit(dimorder,',');
+% 
+% for i = 1:length(dimorder)
+%     a = dimorder{i};
+%     dim{i} = a(1);
+%     clear a
+% end
+% clear dimorder
+% % Now we look at the order and see how we have to change around our
+% % gradient directions so that they match!
+% loc = zeros(1,3);
+% for i=1:3
+%     if dim{i} == 'x'
+%         loc(i) = 1;
+%     elseif dim{i} == 'y'
+%         loc(i) = 2;
+%     elseif dim{i} == 'z'
+%         loc(i) = 3;
+%     else
+%         error('Problem with your dimorder. Check file')
+%     end
+% end
 
 % Change the order of the gradient vectors so it corresponds with the data
 graddir = load('GradientVector.txt');
@@ -80,7 +104,7 @@ gradvec = graddir(round(str2num(nameSpl{end-1})),:); % Get the gradient vector s
 if gradvec > 30
     disp('No gradient. Do not undersample');
 else
-    readloc = find(ismember(dim,rodir)); % This tells us which dimension the readout is on for our dataset, i.e. 1, 2, or 3
+    readloc = find(ismember(dim,gvdir)); % This tells us which dimension the readout is on for our dataset, i.e. 1, 2, or 3
     tester = 1:3;
     tester = find(~ismember(tester,readloc));
     gradvec = gradvec(tester); % Gives us only the values for the non readout direction
