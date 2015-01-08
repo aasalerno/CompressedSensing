@@ -75,3 +75,11 @@ Post Meeting Analysis - Answering the notes from 01/07/15
 	- Will change the way that the filter is done, see GitHub for details (https://github.com/aasalerno/CompressedSensing)
 	- Likely will do it in such a way that we can effortlessly change the filter between different scans for the greatest simplicity
 
+2:00PM
+Found a relatively big issue with respect to how MATLAB is reading in the data. Although the data dimensions are z,x,y for RealImgRaw._._.mnc, with the dimensions of z (180), x (180), y(324), the dataset has dimensions of 324x180x180.
+	- This could be either y,x,z or y,z,x
+	- In order to test this, Matthijs suggested to do a mincreshape and look at where the data is held. I changed the size of z to 200, and noticed the final answer had dimensions of 324x180x200, meaning that the dimensions are y,x,z. This seems to be an inversion (for no reason) on MATLAB's part.
+	- What is the best way to handle this?! We don't want to have any errors... A possible idea would be to apply a mincreshape if there are data that have the same dimensions
+		- So, apparently the information can be found! h5readatt(filename,'minc-2.0/info/vnmr','array')
+		- If we know what the order is (which we do, thanks to Jacob), we can give attributes to each of the dimensions (i.e. possibly a file saying what everything is that can be made for each type or something of the sort
+
