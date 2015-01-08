@@ -30,3 +30,13 @@ Having some troubles with the code, some unusual errors are popping up, but I'm 
 
 11:46PM 
 The only thing left to do would be to possibly make this code functional, and thus allow it to run over an extended period of time on the computers at work. The only issue that could arise with this is the fact that they do not have MATLAB installed on them. A possible fix would be to bring my hard drive and run everything through that - though I hope formatting it won't be necessary. The size of the data files may be a problem for a USB.
+
+
+01/07/15
+Meeting with Brian
+---------------------
+- Ask Jacob about the dimensionality of how he does his scans - make sure that we are doing the analysis using the gradient vector correctly
+- For this first experiment, given the readout gradient, we can use a circle to match the size of the strip for the other readout directions
+- Make sure that it can read back the data that we have written out using H5READ
+- Want to compare the unfiltered data from MATLAB and the filtered data to see, as well as what the full dataset from MATLAB looks like in comparison to vrecon
+- We need a comparison of other no CS undersampling techniques. Parallel to GD, lo-res and perpendicular
