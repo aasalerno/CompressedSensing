@@ -1,4 +1,4 @@
-function undersamp(filename,outname,sampFac,type,gvdir)
+function data = undersamp(filename,outname,sampFac,type,gvdir)
 % This function is made to pseudoundersample a dataset as we wish to do
 % so.
 %
