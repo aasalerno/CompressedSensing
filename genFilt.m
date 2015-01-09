@@ -50,9 +50,9 @@ else
             elseif strcmp(type,'circ')
                 filt = circfilt(slicesz,sampFac);
             end
-                
-                filt = uint16(filt);
-            end
+            
+            filt = uint16(filt);
+            
         elseif readloc == 2
             slicesz = ones(n(1),n(3)); %What is the size of each slice
             filt = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
@@ -67,8 +67,6 @@ else
 end
 
 
-
-end
 
 if showit==1
     imshow(filt,[])
