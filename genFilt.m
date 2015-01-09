@@ -44,7 +44,6 @@ else
             slicesz = ones(n(2),n(3)); %What is the size of each slice
             if strcmp('per',type) || strcmp('par',type)
                 fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
-                
             elseif strcmp(type,'lores')
                 fil = sqfilt(slicesz,sampFac);
             elseif strcmp(type,'circ')
