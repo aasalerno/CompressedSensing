@@ -94,3 +94,6 @@ The options will be:
 	- 'per' - perpendicular to the gradient direction
 	- 'lores' - square in the center for low resolution
 *Possibility to add 'circ' for a circle in the centre*
+	- In order to get the same factor, assuming we have a circle, instead of going out to sqrt(sampFac) on either side (making the undersampled area sampFac of the original), the circle needs to go to a radius of sqrt(sampFac/pi)
+- The expectation is that perpendicular will be best, 'lores' would be second best and parallel would be the worst in terms of reconstruction.
+Changed the name of testline.m to linefilt.m and added some functionality based on infinities vs. NaN's.
