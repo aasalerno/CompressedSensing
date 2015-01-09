@@ -1,4 +1,4 @@
-function undersamp(filename,outname,sampFac,gvdir)
+function undersamp(filename,outname,sampFac,type,gvdir)
 % This function is made to pseudoundersample a dataset as we wish to do
 % so.
 %
@@ -40,6 +40,10 @@ if nargin < 3
 end
 
 if nargin < 4
+    type = 'perp';
+end
+
+if nargin < 5
     gvdir = {'dpe' 'dro' 'dsl'}; % This assumes an order of PE, RO, SL as per the grad vec file
                                  % However, if the order is different, which we
                                  % will check for, it will be changed.
@@ -108,8 +112,7 @@ else
     tester = 1:3;
     tester = find(~ismember(tester,readloc));
     gradvec = gradvec(tester); % Gives us only the values for the non readout direction
-    % Quick and dirty way
-    % to do a projection
+    % Quick and dirty way to do a projection
     
     % Here is where we will have the heart of the code - this is where we will
     % actually do the undersampling
