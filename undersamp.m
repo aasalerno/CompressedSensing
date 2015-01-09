@@ -40,7 +40,7 @@ if nargin < 3
 end
 
 if nargin < 4
-    type = 'perp';
+    type = 'per';
 end
 
 if nargin < 5
@@ -50,6 +50,7 @@ if nargin < 5
 end
 
 rawdata = h5read(filename,'/minc-2.0/image/0/image'); % This gives us the dataset
+disp('Data read in')
 data = zeros(size(rawdata)); % Preallocate memory for speed.
 
 % Double check to make sure that the order is RO, PE, SL
@@ -68,7 +69,7 @@ for i=1:3
         error('Problem with your dimorder. Check file')
     end
 end
-
+disp('Proper order found and corrected')
 
 % OLD METHOD USING DIMORDER
 % % A little bit of work to make sure that we have the correct order for the
@@ -99,6 +100,7 @@ end
 
 % Change the order of the gradient vectors so it corresponds with the data
 graddir = load('GradientVector.txt');
+disp('Gradient Loaded')
 graddir = [graddir(:,loc(1)) graddir(:,loc(2)) graddir(:,loc(3))];
 
 % Get which gradient we're working with by Splitting the name
@@ -121,26 +123,25 @@ else
 %     
 %     gradvec = [-gradvec(2) gradvec(1)]; % Here is where we make it perpendicular
 %     slp = gradvec(2)/gradvec(1);
-%     n = size(rawdata);
-    fil = genFilt(type,data,filename,sampFac,loc,gvdir);
-    if readloc == 1
+    n = size(rawdata);
+    disp('Creating filter')
+    [fil,readloc] = genFilt(type,data,filename,sampFac,loc,gvdir);
+    fil = uint16(fil);
+    disp('Filter created and converted to uint16')
 
+    if readloc == 1
         for i = 1:n(1)
             data(i,:,:) = reshape(fil,size(rawdata(i,:,:))).*rawdata(i,:,:); % Applies the filter to each "slice"
         end
     elseif readloc == 2
 %         slicesz = ones(n(1),n(3)); %What is the size of each slice
 %         filt = testline(slicesz,slp,sampFac); % Make the filter that we will use
-        fil = uint16(fil);
-        
         for i = 1:n(2)
             data(:,i,:) = reshape(fil,size(rawdata(:,i,:))).*rawdata(:,i,:); % Applies the filter to each "slice"
         end
     elseif readloc == 3
 %         slicesz = ones(n(1),n(2)); %What is the size of each slice
 %         filt = testline(slicesz,slp,sampFac); % Make the filter that we will use
-        fil = uint16(fil);
-        
         for i = 1:n(3)
             data(:,:,i) = reshape(fil,size(rawdata(:,:,i))).*rawdata(:,:,i); % Applies the filter to each "slice"
         end
