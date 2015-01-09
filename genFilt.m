@@ -1,4 +1,4 @@
-function [filt,readloc] = genFilt(type,data,filename,sampFac,loc,gvdir)
+function [fil,readloc] = genFilt(type,data,filename,sampFac,loc,gvdir)
 % This function is built to generate the filter for undersampling. As it
 % stands, it will zero fill the rest instead of trying to put some
 % randomness to it (that is, there is no data except for where we put this
@@ -43,25 +43,25 @@ else
         if readloc == 1
             slicesz = ones(n(2),n(3)); %What is the size of each slice
             if strcmp('per',type) || strcmp('par',type)
-                filt = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
+                fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
                 
             elseif strcmp(type,'lores')
-                filt = sqfilt(slicesz,sampFac);
+                fil = sqfilt(slicesz,sampFac);
             elseif strcmp(type,'circ')
-                filt = circfilt(slicesz,sampFac);
+                fil = circfilt(slicesz,sampFac);
             end
             
-            filt = uint16(filt);
+            fil = uint16(fil);
             
         elseif readloc == 2
             slicesz = ones(n(1),n(3)); %What is the size of each slice
-            filt = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
-            filt = uint16(filt);
+            fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
+            fil = uint16(fil);
             
         elseif readloc == 3
             slicesz = ones(n(1),n(2)); %What is the size of each slice
-            filt = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
-            filt = uint16(filt);
+            fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
+            fil = uint16(fil);
         end
     end
 end
@@ -69,5 +69,5 @@ end
 
 
 if showit==1
-    imshow(filt,[])
+    imshow(fil,[])
 end
