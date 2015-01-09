@@ -122,27 +122,27 @@ else
 %     gradvec = [-gradvec(2) gradvec(1)]; % Here is where we make it perpendicular
 %     slp = gradvec(2)/gradvec(1);
 %     n = size(rawdata);
-    filt = genFilt(type,data,filename,sampFac,loc,gvdir);
+    fil = genFilt(type,data,filename,sampFac,loc,gvdir);
     if readloc == 1
 
         for i = 1:n(1)
-            data(i,:,:) = reshape(filt,size(rawdata(i,:,:))).*rawdata(i,:,:); % Applies the filter to each "slice"
+            data(i,:,:) = reshape(fil,size(rawdata(i,:,:))).*rawdata(i,:,:); % Applies the filter to each "slice"
         end
     elseif readloc == 2
 %         slicesz = ones(n(1),n(3)); %What is the size of each slice
 %         filt = testline(slicesz,slp,sampFac); % Make the filter that we will use
-        filt = uint16(filt);
+        fil = uint16(fil);
         
         for i = 1:n(2)
-            data(:,i,:) = reshape(filt,size(rawdata(:,i,:))).*rawdata(:,i,:); % Applies the filter to each "slice"
+            data(:,i,:) = reshape(fil,size(rawdata(:,i,:))).*rawdata(:,i,:); % Applies the filter to each "slice"
         end
     elseif readloc == 3
 %         slicesz = ones(n(1),n(2)); %What is the size of each slice
 %         filt = testline(slicesz,slp,sampFac); % Make the filter that we will use
-        filt = uint16(filt);
+        fil = uint16(fil);
         
         for i = 1:n(3)
-            data(:,:,i) = reshape(filt,size(rawdata(:,:,i))).*rawdata(:,:,i); % Applies the filter to each "slice"
+            data(:,:,i) = reshape(fil,size(rawdata(:,:,i))).*rawdata(:,:,i); % Applies the filter to each "slice"
         end
     end
     
