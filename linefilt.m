@@ -3,7 +3,7 @@ function data = linefilt(data,slp,sampFac)
 s = size(data);
 %slp = 0;
 [x,y] = meshgrid(linspace(-1,1,s(2)),linspace(-1,1,s(1)));
-wid = 0.5*sampFac; %0.5 approximated from algebra from the perpendicular/parallel case
+wid = sampFac; %0.5 approximated from algebra from the perpendicular/parallel case
 
 if ~(isnan(slp)||isinf(abs(slp)))
     lnpts = [[0 0 0];[1,slp,0]];
