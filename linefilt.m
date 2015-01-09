@@ -1,18 +1,18 @@
-function data = testline(data,slp,sampFac)
+function data = linefilt(data,slp,sampFac)
 %data = rand(200,200);
 s = size(data);
 %slp = 0;
 [x,y] = meshgrid(linspace(-1,1,s(2)),linspace(-1,1,s(1)));
 wid = 0.5*sampFac;
 
-if ~isnan(slp)
+if ~(isnan(slp)||isinf(abs(slp)))
     lnpts = [[0 0 0];[1,slp,0]];
 end
 
 
 for i = 1:s(1)
     for j = 1:s(2)
-        if isnan(slp)
+        if (isnan(slp)||isinf(abs(slp)))
             if abs(x(i,j)) < wid
                 data(i,j) = 1;
             else 
