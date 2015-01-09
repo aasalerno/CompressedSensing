@@ -97,3 +97,7 @@ The options will be:
 	- In order to get the same factor, assuming we have a circle, instead of going out to sqrt(sampFac) on either side (making the undersampled area sampFac of the original), the circle needs to go to a radius of sqrt(sampFac/pi)
 - The expectation is that perpendicular will be best, 'lores' would be second best and parallel would be the worst in terms of reconstruction.
 Changed the name of testline.m to linefilt.m and added some functionality based on infinities vs. NaN's.
+
+3:08PM - Codes written
+Codes run error free but that doesn't mean that they are necessarily correct.
+Something that we need to keep in mind is how the casting is done in vrecon etc so that we don't have any differences. An error that I'm scared of getting is from how we map the values to uint16, as it may be too simple. It may be better to do it as a mapminmax where we specify the min and max to be the values obtainable using uint16. An (unfortunately) plausible error that could occur could be based on inconsistencies between the two datasets, as we won't necessarily have the same minimum as the original dataset in the final dataset. 
