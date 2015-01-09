@@ -71,11 +71,12 @@ Post Meeting Analysis - Answering the notes from 01/07/15
 		test1 == test2 % If this gives 1, we're good!
 	- Using this, we get the value that we expect.		 
 - Want to compare the unfiltered data from MATLAB and the filtered data to see the differences that exist, as well as what the full dataset from MATLAB looks like in comparison to vrecon. Here, we are trying to make sure that we don't have any differences from how the data is stored in the mnc file!
+	- One thing to note is what Matthijs said about how the data is cast by the visualization tools... May need to ensure that we do the FFT in the same datatype as it would be done in vrecon (i.e. is this before or after conversion? And if before, how will we change back to the old dataset?)
 - We need a comparison of other no CS undersampling techniques. Parallel to GD, lo-res and perpendicular
 	- Will change the way that the filter is done, see GitHub for details (https://github.com/aasalerno/CompressedSensing)
 	- Likely will do it in such a way that we can effortlessly change the filter between different scans for the greatest simplicity
 
-2:00PM
+2:00PM - Error with input of data
 Found a relatively big issue with respect to how MATLAB is reading in the data. Although the data dimensions are z,x,y for RealImgRaw._._.mnc, with the dimensions of z (180), x (180), y(324), the dataset has dimensions of 324x180x180.
 	- This could be either y,x,z or y,z,x
 	- In order to test this, Matthijs suggested to do a mincreshape and look at where the data is held. I changed the size of z to 200, and noticed the final answer had dimensions of 324x180x200, meaning that the dimensions are y,x,z. This seems to be an inversion (for no reason) on MATLAB's part.
@@ -83,3 +84,13 @@ Found a relatively big issue with respect to how MATLAB is reading in the data. 
 		- So, apparently the information can be found! h5readatt(filename,'minc-2.0/info/vnmr','array')
 		- If we know what the order is (which we do, thanks to Jacob), we can give attributes to each of the dimensions (i.e. possibly a file saying what everything is that can be made for each type or something of the sort
 
+
+01/09/15
+9:43AM - Filter Function Alteration
+At YorkU - working on Laptop (will be noted from now on)
+Meeting with Brian said that we need to have different filters to compare... As it stands right now, we only have one option, but the others are to be coded in right now.
+The options will be:
+	- 'par' - parallel to the gradient direction
+	- 'per' - perpendicular to the gradient direction
+	- 'lores' - square in the center for low resolution
+*Possibility to add 'circ' for a circle in the centre*
