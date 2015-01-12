@@ -41,8 +41,7 @@ if isa(dataset,'uint16') || isa(dataset,'string') || isa(dataset,'char')
         N = size(dataset);
         mapdata = zeros(N);
         n = size(datamax);
-        disp('Image, max, and min read in. Second matrix made to be altered for output');
-        
+
         % Double check to make sure that the order is RO, PE, SL
         check = h5readatt(filename,'/minc-2.0/info/vnmr','array');
         check = check(2:end-2); % This gets rid of the brackets at the beginning and end
@@ -50,7 +49,6 @@ if isa(dataset,'uint16') || isa(dataset,'string') || isa(dataset,'char')
         refStr = 'dsl';
         ind = strfind(check,refStr);
         ind = find(~cellfun(@isempty,ind));
-        disp('Dimension of the slice found.')
     else
         n = size(datamax);
     end
