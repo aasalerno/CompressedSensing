@@ -108,11 +108,15 @@ The plans for today include writing codes to:
 - Read in a minc file (doable from code already written) [mincread.m]
 	- Allows for one to read in the image, max or min values
 - Map a minc file depending on the max and min values contained in them
-	- Written as of 2:45PM
-	- Allows forward processing, attempting to input reverse algorithm
+	- Written as of 2:45PM [mincmap.m]
 	- Speeds seem very fast as of right now
+	- Need to add functionality to not ONLY work with files but also with datasets, provided that we have the max and min already
 	- Logical to make a different code to do the reverse, as the only information we need is slice dimension, which can be input as a number, or if it's a string, we will look in the specified filename
+	- Written [mincmap16.m]
 - Write a minc file, data and max/min values
 	- The aforementioned code would be good to have for this case, with a quick case switch depending on if the data is in uint16 or double, as h5 needs the data in uint16
-- Do a 1D FFT on mapped minc data
-- DO a 3D FFT on mapped minc data
+		- WORKING (decent). According to MATLAB, if I load one from the file and apply the forward and reverse transforms to another, MATLAB says they're different, but it also says that the difference between the two is zero for all values.
+	- Written and seemingly works! [mincwrite.m]
+- Do a 1D & 3D FFT on mapped minc data
+	- The problem I have with this is how exactly do I plan to *store*the data after to be looked at... This doesn't make sense to me, unfortunately...
+	- In process of writing a code to do both, but noticed some functionality errors with mincmap.m, need to fix those first.
