@@ -1,4 +1,4 @@
-function mapdata = mincmap16(data,dim)
+function [mapdata,mindat,maxdat] = mincmap16(data,dim)
 % mapdata = mincmap16(data,dim)
 %
 % The funciton is made to quickly bring the data from double to uint16. It
