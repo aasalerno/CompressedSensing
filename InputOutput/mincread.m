@@ -4,10 +4,10 @@ function data = mincread(filename,type)
 % The sole purpose of this code is to get the image data or max/min data
 % from a minc file
 % 
-% if nargin < 2
-%     type = 'image';
-% end
-type
+if nargin < 2
+    type = 'image';
+end
+
 
 if strcmp(type,'image')
     data = h5read(filename,'/minc-2.0/image/0/image');
