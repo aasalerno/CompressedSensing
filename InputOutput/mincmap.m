@@ -1,4 +1,4 @@
-function mapdata = mincmap(filename)
+function mapdata = mincmap(dataname)
 % mapdata = mincmap(filename)
 %
 %
@@ -12,16 +12,16 @@ function mapdata = mincmap(filename)
 % optimized to work more quickly and efficiently
 
 % Read in some data
-data = mincread(filename,'image');
-datamax = mincread(filename,'max');
-datamin = mincread(filename,'min');
+data = mincread(dataname,'image');
+datamax = mincread(dataname,'max');
+datamin = mincread(dataname,'min');
 N = size(data);
 mapdata = zeros(N);
 n = size(datamax);
 disp('Image, max, and min read in. Second matrix made to be altered for output');
 
 % Double check to make sure that the order is RO, PE, SL
-check = h5readatt(filename,'/minc-2.0/info/vnmr','array');
+check = h5readatt(dataname,'/minc-2.0/info/vnmr','array');
 check = check(2:end-2); % This gets rid of the brackets at the beginning and end
 check = strsplit(check,',');
 refStr = 'dsl'; 
