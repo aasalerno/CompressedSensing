@@ -14,7 +14,7 @@ if strcmp(type,'image')
 elseif strcmp(type,'max')
     data = h5read(filename,'/minc-2.0/image/0/image-max');
 elseif strcmp(type,'min')
-    data = h5read(filename,'/minc-2.0/image/0/image-max');
+    data = h5read(filename,'/minc-2.0/image/0/image-min');
 else
     data = 0;
     disp('Type not understood. Retry with either ''image'', ''max'', or ''min''');
