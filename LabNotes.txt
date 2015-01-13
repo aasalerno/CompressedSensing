@@ -132,3 +132,5 @@ Should make a file that can do a full recon based off of the data that we curren
 This function can then be put into a script to be done recursively over all datasets.
 
 THERE IS A MAJOR ERROR IN MINCMAP and thus it isn't working properly. The zero, as noted earlier, may have just been a fluke.
+	- The error came from how dataset was handling the multiplication. uint16*double = uint16
+	- Second error found, where mincmap was dividing by 2^16 instead of 2^16-1 (same with mincmap16)
