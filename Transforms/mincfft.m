@@ -12,7 +12,7 @@ if nargin < 3
     dim = 3;
 end
 
-if nargin < 4 && ~isa(data,'char')
+if nargin < 4 && ~isa(data,'char') && ~isa(data,'double')
     error('Need to specify maxima and minima of data')
 end
 
