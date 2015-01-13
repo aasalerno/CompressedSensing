@@ -56,17 +56,17 @@ if isa(dataset,'uint16') || isa(dataset,'string') || isa(dataset,'char')
     dataset = double(dataset);
     if ind == 1
         for i = 1:n
-            dy = (datamax(i)-datamin(i))/(2^16); %Overall difference between max and min over the number of points
+            dy = (datamax(i)-datamin(i))/(2^16-1); %Overall difference between max and min over the number of points
             mapdata(i,:,:) = dataset(i,:,:)*dy + datamin(i);
         end
     elseif ind == 2
         for i = 1:n
-            dy = (datamax(i)-datamin(i))/(2^16); %Overall difference between max and min over the number of points
+            dy = (datamax(i)-datamin(i))/(2^16-1); %Overall difference between max and min over the number of points
             mapdata(:,i,:) = dataset(:,i,:)*dy + datamin(i);
         end
     elseif ind == 3
         for i = 1:n
-            dy = (datamax(i)-datamin(i))/(2^16); %Overall difference between max and min over the number of points
+            dy = (datamax(i)-datamin(i))/(2^16-1); %Overall difference between max and min over the number of points
             mapdata(:,:,i) = dataset(:,:,i)*dy + datamin(i);
         end
     end
