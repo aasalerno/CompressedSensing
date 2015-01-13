@@ -130,3 +130,5 @@ Should make a file that can do a full recon based off of the data that we curren
 	- Write the magnitude information to file
 	- Write the min and max information to file
 This function can then be put into a script to be done recursively over all datasets.
+
+THERE IS A MAJOR ERROR IN MINCMAP and thus it isn't working properly. The zero, as noted earlier, may have just been a fluke.
