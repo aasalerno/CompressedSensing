@@ -134,3 +134,6 @@ This function can then be put into a script to be done recursively over all data
 THERE IS A MAJOR ERROR IN MINCMAP and thus it isn't working properly. The zero, as noted earlier, may have just been a fluke.
 	- The error came from how dataset was handling the multiplication. uint16*double = uint16
 	- Second error found, where mincmap was dividing by 2^16 instead of 2^16-1 (same with mincmap16)
+
+MORE ISSUES!
+Need to be able to find out how much each file was rotated (if it was) in the data - if it wasn't we're in the clear as this may be before registration.
