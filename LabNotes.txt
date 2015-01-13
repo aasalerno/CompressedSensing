@@ -120,3 +120,13 @@ The plans for today include writing codes to:
 - Do a 1D & 3D FFT on mapped minc data
 	- The problem I have with this is how exactly do I plan to *store*the data after to be looked at... This doesn't make sense to me, unfortunately...
 	- In process of writing a code to do both, but noticed some functionality errors with mincmap.m, need to fix those first.
+	- Written, and seems to work well (didn't look at the FFT data however)
+
+8:18PM
+Should make a file that can do a full recon based off of the data that we currently have. It should:
+	- Take in the data, both real and imaginary
+	- Perform a 3D FFT on the summative dataset
+	- Take the magnitude of the FFT
+	- Write the magnitude information to file
+	- Write the min and max information to file
+This function can then be put into a script to be done recursively over all datasets.
