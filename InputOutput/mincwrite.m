@@ -8,7 +8,6 @@ function mincwrite(filename,outname,data,maxdata,mindata)
 % information, such as this, that we need, in the case that the "filename",
 % i.e. what we are copying, isn't the same as the data we are processing.
 
-copyfile(filename,outname);
 
 if nargin < 3
     error('Not enough input arguments');
