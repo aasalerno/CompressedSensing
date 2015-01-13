@@ -23,21 +23,21 @@ elseif dim == 1
     for i = N(dim)
         mindat(i) = min(min(squeeze(data(i,:,:))));
         maxdat(i) = max(max(squeeze(data(i,:,:))));
-        dy = (maxdat(i)-mindat(i))/2^16;
+        dy = (maxdat(i)-mindat(i))/(2^16-1);
         mapdata(i,:,:) = (data(i,:,:)-mindat(i))./dy;
     end
 elseif dim == 2
     for i = N(dim)
         mindat(i) = min(min(squeeze(data(:,i,:))));
         maxdat(i) = max(max(squeeze(data(:,i,:))));
-        dy = (maxdat(i)-mindat(i))/2^16;
+        dy = (maxdat(i)-mindat(i))/(2^16-1);
         mapdata(:,i,:) = (data(:,i,:)-mindat(i))./dy;
     end
 elseif dim == 3
     for i = N(dim)
         mindat(i) = min(min(squeeze(data(:,:,i))));
         maxdat(i) = max(max(squeeze(data(:,:,i))));
-        dy = (maxdat(i)-mindat(i))/2^16;
+        dy = (maxdat(i)-mindat(i))/(2^16-1);
         mapdata(:,:,i) = (data(:,:,i)-mindat(i))./dy;
     end
 end
