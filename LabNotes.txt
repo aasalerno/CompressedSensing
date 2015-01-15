@@ -137,3 +137,20 @@ THERE IS A MAJOR ERROR IN MINCMAP and thus it isn't working properly. The zero, 
 
 MORE ISSUES!
 Need to be able to find out how much each file was rotated (if it was) in the data - if it wasn't we're in the clear as this may be before registration.
+
+
+01/15/15
+In Lab
+Note that Brian said something about the "array" variable being untrustworthy, and thus we may have to find some other way to figure out data orientation if we want this to be used in the future.
+Computers are now able to run MATLAB (for the next 17 days, apparently), so I will try to run some of the codes from here
+	- Something I may try to do is to run a system check for which codes to run, otherwise, I'll have to hard code it in...
+	- Use function "ispc" or "isunix" - albeit kludgey, it will give the answers that we need for right now.
+
+11:54AM
+Going to start building the filter recon code as I can have it run on these computers overnight!
+It will use "undersamp.m" as a basis or use undersamp, but we need to change a few things
+	- It will be used in another script that will effectively create the different path names as we require them
+	- We want to FFT them before we write them to file
+		- In order to do this, we should make sure to also read in the maxmin information for the data
+	-
+
