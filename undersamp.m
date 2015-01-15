@@ -10,7 +10,8 @@ function data = undersamp(filename,outname,sampFac,filttype,gvdir)
 % This function has some parts of a code that I wrote in order to build
 % PDFs (probability density functions) for spreading outside of a line.
 %
-%
+% The purpose of this code is to merely UNDERSAMPLE the code, and NOT to
+% actually FFT it and everything else like that!
 %
 % The parameters are as follows:
 %
@@ -151,9 +152,10 @@ else
     end
     
 % In order to have this work properly, we need to make a copy of the original file to the output file, then change the data that we so choose
-    datawrite = mincfft(data,3,1,datamax,datamin);
-    [datawritemin,datawritemax] = mincmaxmin(datawrite,3);
-    mincwrite(filename,outname,datawrite,datawritemax,datawritemin);
+%     datawrite = mincfft(data,3,1,datamax,datamin);
+%     [datawritemin,datawritemax] = mincmaxmin(datawrite,3);
+%     mincwrite(filename,outname,datawrite,datawritemax,datawritemin);
+    mincwrite(filename,outname,data,datamax,datamin);
     
 end
 
