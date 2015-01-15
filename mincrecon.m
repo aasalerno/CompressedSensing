@@ -1,4 +1,4 @@
-function Data = mincrecon(fileSuf)
+function Data = mincrecon(fileSuf,base)
 % Data = mincrecon(filebase)
 %
 % This function will:
@@ -6,14 +6,29 @@ function Data = mincrecon(fileSuf)
 % 	- Take the magnitude of the FFT
 % 	- Write the magnitude information to file
 % 	- Write the min and max information to file
-% This function can then be put into a script to be done recursively over 
+% This function can then be put into a script to be done recursively over
 % all datasets.
 
-% This is specific for the current dataset and should be phased out!
-base = 'C:\Users\saler_000\Documents\raw\';
-prefixR = 'real\Real';
-prefixI = 'imag\Imag';
-
+if nargin<2
+    % This is specific for the current dataset and should be phased out!
+    if ispc()
+        base = 'C:\Users\saler_000\Documents\raw\';
+        prefixR = 'real\Real';
+        prefixI = 'imag\Imag';
+    else
+        base = '/projects/souris/asalerno/CS/data/';
+        prefixR = 'Real';
+        prefixI = 'Imag';
+    end
+else
+    if ispc()
+        prefixR = 'real\Real';
+        prefixI = 'imag\Imag';
+    else
+        prefixR = 'Real';
+        prefixI = 'Imag';
+    end
+end
 % Build the paths
 pathR = [base prefixR fileSuf];
 pathI = [base prefixI fileSuf];
@@ -23,7 +38,7 @@ pathI = [base prefixI fileSuf];
 % dataR = mincread(pathR,'image');
 % dataRmax = mincread(pathR,'max');
 % dataRmin = mincread(pathR,'min');
-% 
+%
 % % Obtain all of the data for the imaginary dataset
 % dataI = mincread(pathI,'image');
 % dataImax = mincread(pathI,'max');
@@ -34,7 +49,7 @@ pathI = [base prefixI fileSuf];
 %
 
 dataR = mincmap(pathR); % Maps the data to double using the information in the minc file specified
-dataI = mincmap(pathI); % " " " " " " " " " " " " " " " " " " " " " " " " " " " 
+dataI = mincmap(pathI); % " " " " " " " " " " " " " " " " " " " " " " " " " " "
 
 % Build the dataset
 data = dataR + 1i*dataI; % This is the total dataset as we expect it, with both real and imaginary parts
