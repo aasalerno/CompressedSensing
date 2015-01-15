@@ -50,9 +50,9 @@ if nargin < 5
                                  % will check for, it will be changed.
 end
 
-rawdata = mincread(filename,'image'); % This gives us the dataset (k-space)
-datamin = mincread(filename,'min'); % to be used in mincfft
-datamax = mincread(filename,'max'); % to be used in mincfft
+rawdata = mincmap(filename); % This gives us the dataset (k-space)
+% datamin = mincread(filename,'min'); % to be used in mincfft
+% datamax = mincread(filename,'max'); % to be used in mincfft
 
 disp('Data read in')
 data = zeros(size(rawdata)); % Preallocate memory for speed.
@@ -130,8 +130,8 @@ else
     n = size(rawdata);
     disp('Creating filter')
     [fil,readloc] = genFilt(filttype,data,filename,sampFac,loc,gvdir);
-    fil = uint16(fil);
-    disp('Filter created and converted to uint16')
+    fil = double(fil);
+    disp('Filter created and converted to double')
 
     if readloc == 1
         for i = 1:n(1)
@@ -153,7 +153,8 @@ else
     
 % In order to have this work properly, we need to make a copy of the original file to the output file, then change the data that we so choose
 %     datawrite = mincfft(data,3,1,datamax,datamin);
-%     [datawritemin,datawritemax] = mincmaxmin(datawrite,3);
+     [datamin,datamax] = mincmaxmin(data,3);
+     data = mincmap16(data,3);
 %     mincwrite(filename,outname,datawrite,datawritemax,datawritemin);
     mincwrite(filename,outname,data,datamax,datamin);
     
