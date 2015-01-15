@@ -46,15 +46,15 @@ nD = numel(dirs);
 totScan = nB*nD;
 for i = 1:nB
     for j = 1:nD
-        numScan = (nD-1)*i + j;
+        numScan = (i-1)*nD + j;
         disp(['Undersampling. On brain ' num2str(brains(i)) ', direction ' num2str(dirs(j)) ...
             '. This is brain ' num2str(numScan) ' of ' num2str(totScan)]);
         
-        fileEndR = [USfilenameR '.' num2str(brain(i)) '.' num2str(dirs(j)) fileSuf]; % Full input filenames
-        fileEndI = [USfilenameI '.' num2str(brain(i)) '.' num2str(dirs(j)) fileSuf];
+        fileEndR = [USfilenameR '.' num2str(brains(i)) '.' num2str(dirs(j)) fileSuf]; % Full input filenames
+        fileEndI = [USfilenameI '.' num2str(brains(i)) '.' num2str(dirs(j)) fileSuf];
         % FUll output filenames
-        outpathR = [outpathdirK prefixR 'US_' filttype '.' num2str(brain(i)) '.' num2str(dirs(j)) fileSuf];
-        outpathI = [outpathdirK prefixI 'US_' filttype '.' num2str(brain(i)) '.' num2str(dirs(j)) fileSuf];
+        outpathR = [outpathdirK prefixR 'US_' filttype '.' num2str(brains(i)) '.' num2str(dirs(j)) fileSuf];
+        outpathI = [outpathdirK prefixI 'US_' filttype '.' num2str(brains(i)) '.' num2str(dirs(j)) fileSuf];
         
         % Undersample to file
         undersamp(fileEndR,outpathR,sampFac,filttype);
@@ -62,7 +62,7 @@ for i = 1:nB
         
         
         % Now, we have the files, but need to do the recon!
-        fileSufRecon = ['US' filttype '.' num2str(brain(i)) '.' num2str(dirs(j)) fileSuf];
+        fileSufRecon = ['US_' filttype '.' num2str(brains(i)) '.' num2str(dirs(j)) fileSuf];
         
         % Do the FFT and write to file!
         data = mincrecon(fileSufRecon,outpathdirK);
@@ -70,7 +70,7 @@ for i = 1:nB
         
         ind = mincind(fileEndR,'dsl');
         [datamin,datamax] = mincmaxmin(data,ind);
-        outpathRecon = [outpathdirX 'Recon_' filttype '.' num2str(brain(i)) '.' num2str(dirs(j)) fileSuf];
+        outpathRecon = [outpathdirX 'Recon_' filttype '.' num2str(brains(i)) '.' num2str(dirs(j)) fileSuf];
         mincwrite(fileEndR,outpathRecon,data,datamax,datamin);
     end
 end
