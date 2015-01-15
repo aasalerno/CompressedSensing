@@ -30,7 +30,7 @@ if n == numel(N); % FULL fft
     y = fftshift(y);
 elseif n == 1 % 1D fft over the dimension dim
     y = fft(data,[],dim);
-    y = fftshift(y);
+    y = fftshift(y,dim);
 elseif n == 2 % 2D fft in a for loop going through the dimension of choice
     y = zeros(size(data));
     if dim == 1
