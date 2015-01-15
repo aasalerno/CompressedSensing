@@ -1,4 +1,4 @@
-function data = undersamp(filename,outname,sampFac,type,gvdir)
+function data = undersamp(filename,outname,sampFac,filttype,gvdir)
 % This function is made to pseudoundersample a dataset as we wish to do
 % so.
 %
@@ -40,7 +40,7 @@ if nargin < 3
 end
 
 if nargin < 4
-    type = 'per';
+    filttype = 'per';
 end
 
 if nargin < 5
@@ -49,7 +49,10 @@ if nargin < 5
                                  % will check for, it will be changed.
 end
 
-rawdata = h5read(filename,'/minc-2.0/image/0/image'); % This gives us the dataset
+rawdata = mincread(filename,'image'); % This gives us the dataset (k-space)
+datamin = mincread(filename,'min'); % to be used in mincfft
+datamax = mincread(filename,'max'); % to be used in mincfft
+
 disp('Data read in')
 data = zeros(size(rawdata)); % Preallocate memory for speed.
 
@@ -125,7 +128,7 @@ else
 %     slp = gradvec(2)/gradvec(1);
     n = size(rawdata);
     disp('Creating filter')
-    [fil,readloc] = genFilt(type,data,filename,sampFac,loc,gvdir);
+    [fil,readloc] = genFilt(filttype,data,filename,sampFac,loc,gvdir);
     fil = uint16(fil);
     disp('Filter created and converted to uint16')
 
@@ -148,8 +151,9 @@ else
     end
     
 % In order to have this work properly, we need to make a copy of the original file to the output file, then change the data that we so choose
-    copyfile(filename,outname);
-    h5write(outname,'/minc-2.0/image/0/image',data);
+    datawrite = mincfft(data,3,1,datamax,datamin);
+    [datawritemin,datawritemax] = mincmaxmin(datawrite,3);
+    mincwrite(filename,outname,datawrite,datawritemax,datawritemin);
     
 end
 
