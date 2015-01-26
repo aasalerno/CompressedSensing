@@ -42,6 +42,7 @@ else
     
     if all(gradvec == [0 0])
         % We use the circle filter in this case
+        
     else
         slp = gradvec(2)/gradvec(1);
         n = size(data);
@@ -55,18 +56,36 @@ else
                 fil = sqfilt(slicesz,sampFac);
             elseif strcmp(filttype,'circ')
                 fil = circfilt(slicesz,sampFac);
+            else
+                error('Not an understood filter. Use circ, lores, par or per');
             end
             
             fil = uint16(fil);
             
         elseif readloc == 2
             slicesz = ones(n(1),n(3)); %What is the size of each slice
-            fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
+            if strcmp('per',filttype) || strcmp('par',filttype)
+                fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
+            elseif strcmp(filttype,'lores')
+                fil = sqfilt(slicesz,sampFac);
+            elseif strcmp(filttype,'circ')
+                fil = circfilt(slicesz,sampFac);
+            else
+                error('Not an understood filter. Use circ, lores, par or per');
+            end
             fil = uint16(fil);
             
         elseif readloc == 3
             slicesz = ones(n(1),n(2)); %What is the size of each slice
-            fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
+            if strcmp('per',filttype) || strcmp('par',filttype)
+                fil = linefilt(slicesz,slp,sampFac); % Make the filter that we will use
+            elseif strcmp(filttype,'lores')
+                fil = sqfilt(slicesz,sampFac);
+            elseif strcmp(filttype,'circ')
+                fil = circfilt(slicesz,sampFac);
+            else
+                error('Not an understood filter. Use circ, lores, par or per');
+            end
             fil = uint16(fil);
         end
     end
