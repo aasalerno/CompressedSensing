@@ -109,9 +109,9 @@ graddir = [graddir(:,loc(1)) graddir(:,loc(2)) graddir(:,loc(3))];
 
 % Get which gradient we're working with by Splitting the name
 nameSpl = strsplit(filename,'.');
-gradvec = graddir(round(str2num(nameSpl{end-1})),:); % Get the gradient vector so we know which one we need
 
-if gradvec > 30
+
+if str2num(nameSpl{end-1}) > 30
     disp('No gradient. Do not undersample');
 else
 %     readloc = find(ismember(dim,gvdir)); % This tells us which dimension the readout is on for our dataset, i.e. 1, 2, or 3
@@ -127,6 +127,7 @@ else
 %     
 %     gradvec = [-gradvec(2) gradvec(1)]; % Here is where we make it perpendicular
 %     slp = gradvec(2)/gradvec(1);
+    gradvec = graddir(round(str2num(nameSpl{end-1})),:); % Get the gradient vector so we know which one we need
     n = size(rawdata);
     disp('Creating filter')
     [fil,readloc] = genFilt(filttype,data,filename,sampFac,loc,gvdir);
@@ -151,12 +152,12 @@ else
         end
     end
     
+
+    
+end
 % In order to have this work properly, we need to make a copy of the original file to the output file, then change the data that we so choose
 %     datawrite = mincfft(data,3,1,datamax,datamin);
      [datamin,datamax] = mincmaxmin(data,3);
      data = mincmap16(data,3);
 %     mincwrite(filename,outname,datawrite,datawritemax,datawritemin);
     mincwrite(filename,outname,data,datamax,datamin);
-    
-end
-
