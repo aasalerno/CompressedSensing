@@ -152,5 +152,63 @@ It will use "undersamp.m" as a basis or use undersamp, but we need to change a f
 	- It will be used in another script that will effectively create the different path names as we require them
 	- We want to FFT them before we write them to file
 		- In order to do this, we should make sure to also read in the maxmin information for the data
-	-
+
+		
+01/28/15
+9:58AM
+FA and MD Maps
+Yesterday I had a meeting with Jacob, and he told me to do the following in order to get everything to work for the FA and MD maps.
+-----------------------------------------------------------------------------------------------
+DTI Recon and Analysis Steps:
+
+export FIDDIR="."
+export IMGDIR="."
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/projects/mice/share/arch/linux-x86_64-glibc2_3/matlab2010b/runtime/glnxa64:/projects/mice/share/arch/linux-x86_64-glibc2_3/matlab2010b/bin/glnxa64:/projects/mice/jbishop/bin;
+
+Edit procpar: Change npetables from 25 to 1
+
+/projects/mice/jbishop/bin/vrecon_w -vmap /projects/mice/jacob/fid/table_test/JE_Table_Angdist_nf60_ni17 -noclip -shiftppe2 fid DW_Recon
+
+After Recon in the Directory where all the files were put.
+
+for i in `seq 1 16`; do for j in `seq 1 9`; do mv DW_Recon.${i}.${j}.mnc DW_Recon.${i}.0${j}.mnc; done; done; for i in `seq 1 16`; do mincconcat -concat_dimension time DW_Recon.${i}.*.mnc DW_Recon.${i}.mnc -clobber; done; for i in `seq 1 16`; do echo DW_Recon.${i}.mnc; mincreshape -2 -quiet -clobber -dimrange time=1,30 DW_Recon.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} DW_Recon.${i}_highb.mnc; rm tmp_${i}; mincreshape -2 -quiet -clobber -dimrange time=31,35 DW_Recon.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} DW_Recon.${i}_b0.mnc; rm tmp_${i}; done;
+
+After that has been accomplished the rest of the analysis follows.
+
+But what you need to start from is the 4D image files (DW_Recon.${i}.mnc or 4D_IMAGE_NAMES.mnc) from the reconstructed data set.  This will be located in the fid directory the day of your scan in the /projects/mice/jacob/fid/ directory. If you are unsure which is the 4D file do a mincinfo and it will look like:
+
+image: unsigned short 0 to 65535
+image dimensions: time zspace xspace yspace
+    dimension name         length         step        start
+    --------------         ------         ----        -----
+    time                       35            1            0
+    zspace                    180     0.077778      42.0389
+    xspace                    180    -0.077778      28.9611
+    yspace                    324     -0.07716      12.4614
+
+Then that image needs to be converted to nifty format, which is easy thanks to Jan.  
+>  for i in `seq 1 16`; do base=`basename DW_Recon.${i}.mnc .mnc`; miceconvert DW_Recon.${i}.mnc ${base}_FSL; done;
+
+That will run for a bit and then you have a bunch of files named 4D_IMAGE_NAMES.nii.gz.  Then you need to create a mask file for those images. You do this with the following command
+
+> for file in *_FSL.nii.gz; do base=`basename $file .nii.gz`; fslmaths $file -Tmean -mul 0 -add 1 ${base}_mask; done;
+
+That will run for a bit and it will create a new file for each of your 4D_IMAGE_NAMES that has _mask.nii.gz at the end.  The you want to copy the following files over to your directory "bvals" and "bvecs" which are located in "/projects/mice/jacob/fid/02jun13.fid/FSL/".  Once you have those files you are ready to create your DTI images using "dtifit"
+
+> for file in 4D_IMAGE_NAMES_FSL.nii.gz; do base=`basename $file .nii.gz`; dtifit -k ${base} -o ${base}_DTI -m ${base}_mask -r bvecs -b bvals; done;
+
+That will create a multitude of files for each 4D image.  They will all have two letter designations for which is which (i.e. FA, MD, L1, L2 etc.).  I convert them back to mmc files at this point for the analysis.  I usually just convert the MD, FA, L1, L2 and L3.
+
+> for file in 4D_IMAGE_NAMES_FSL.nii.gz; do base=`basename $file .nii.gz`;  for i in MD FA L1 L2 L3; do ~jscholz/bin/micescripts/miceconvert ${base}_DTI_${i}.nii.gz ${base}_DTI_${i}_new.nii.gz; done; done;
+
+ON the FARMS:
+> for file in 4D_IMAGE_NAMES_FSL.nii.gz; do base=`basename $file .nii.gz`;  for i in MD FA L1 L2 L3; do sge_batch ~jscholz/bin/micescripts/miceconvert ${base}_DTI_${i}.nii.gz ${base}_DTI_${i}_new.nii.gz; done; done;
+
+Now you should have all the MD, FA and 3 Eigenvalues images in mmc format.  Then you need to distortion correct each of them. Since the coil number doesn't make it through all of this work you will need to specify the coil number for each file with a ":1" or ":2" behind the file name.  You should be able to create a loop for this.
+-----------------------------------------------------------------------------------------------
+One thing that he noted was that Jan stated that the gradient vectors should have the y-value negated in order to get the correct eigenvectors and eigenvalues, which seems weird to me. So, I'm rerunning the codes in both styles, with the old gradient vector, and with the new gradient vector
+  - Due to an error in processing the codes, the data will have the form that "_new" will be the new stuff using the negative y-values, and the normal stuff will be those with the original y-values
+  - I had to rerun the code because of the same error as mentioned earlier
+  
+  
 
