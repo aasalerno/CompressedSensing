@@ -210,5 +210,78 @@ One thing that he noted was that Jan stated that the gradient vectors should hav
   - Due to an error in processing the codes, the data will have the form that "_new" will be the new stuff using the negative y-values, and the normal stuff will be those with the original y-values
   - I had to rerun the code because of the same error as mentioned earlier
   
+02/09/15
+Doing the recons is finally done and I've made some FA and MD maps and all that jazz.
+
+Some code to do all of that stuff can be found right here:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sty="par";
+nb=8;
+
+for i in `seq 1 ${nb}`; do for j in `seq 1 9`; do mv Recon_${sty}.${i}.${j}.mnc Recon_${sty}.${i}.0${j}.mnc; done; done; for i in `seq 1 ${nb}`; do mincconcat -concat_dimension time Recon_${sty}.${i}.*.mnc Recon_${sty}.${i}.mnc -clobber; done; for i in `seq 1 ${nb}`; do echo Recon_${sty}.${i}.mnc; mincreshape -2 -quiet -clobber -dimrange time=1,30 Recon_${sty}.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} Recon_${sty}.${i}_highb.mnc; rm tmp_${i}; mincreshape -2 -quiet -clobber -dimrange time=31,35 Recon_${sty}.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} Recon_${sty}.${i}_b0.mnc; rm tmp_${i}; done;
+
+for i in `seq 1 ${nb}`; do base=`basename Recon_${sty}.${i}.mnc .mnc`; miceconvert Recon_${sty}.${i}.mnc ${base}_FSL; done; 
+
+for i in `seq 1 ${nb}`; do t=$(expr $i - 1); fileArray[${t}]="Recon_"${sty}"."${i}"_FSL.nii.gz"; done;
+
+for file in ${fileArray[*]}; do base=`basename $file .nii.gz`; fslmaths $file -Tmean -mul 0 -add 1 ${base}_mask; done;
+
+for i in `seq 1 ${nb}`; do for file in Recon_${sty}.${i}_FSL.nii.gz; do base=`basename $file .nii.gz`; dtifit -k ${base} -o ${base}_DTI -m ${base}_mask -r bvecs -b bvals; done; done;
+
+for j in `seq 1 ${nb}`; do for file in Recon_${sty}.${j}_FSL.nii.gz; do base=`basename $file .nii.gz`;  for i in MD FA L1 L2 L3; do ~jscholz/bin/micescripts/miceconvert ${base}_DTI_${i}.nii.gz ${base}_DTI_${i}.nii.gz; done; done; done;
+
+
+if test ! -d "$Distortion_Correction"; then mkdir "$Distortion_Correction"; fi
+
+for i in `seq 1 ${nb}`; do for j in MD FA L1 L2 L3; do /micehome/matthijs/32-bit/bin/distortion_correction_september_2014.pl Distortion_Correction/ Recon_${sty}.${i}_FSL_DTI_${j}.nii.gz.mnc:${i}; done; done;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+- I noted that brain 4 is terrible. I don't think that there was actually a brain in there... Will talk to Jacob about that now. 
+
+Creating a mincrms function in order to test the RMS difference between my data and Jacob's.
+  - However, something fishy happens in my data, and for some unapparent reason, it gets skyrocketed to the order of 1e4.
+  - An idea for right now is to use a ratio system. We will use a comparative analysis between the maxima and minima
+    - However, a pretty major problem arises from this! If the system exists such that theres a net decrease in the level, then we wont be able to see this, as it will be normalized.
+  - The problem arises from how the data files are (i.e. the minc files before the FFT is done. I may need to get rid of the DC component... Possibly getting rid of the average?
+ 
+02.11.15
+MEETING WITH BRIAN:
+
+Want to talk about a few things:
+
+1) DEALING WITH JACOB'S DATA IN COMPARISON TO MY OWN
+a) Currently have a simple code that compares values from maps but there's a huge intensity difference between my data and Jacob's - how should I deal with this?
+	- Should be able to do just a straight visual comparison using the FA maps
+	- We want to see if we've just included some blur or what exactly is happening
+		- May run the data through the same pipeline without a mask to normalize properly
+	
+b) I actually have to make the maps for Jacob's data which I didn't realize, so I'm doing that now
+
+2) WORKING WITH LISA (GAZDZINSKI) ON THE OPT DATA SO THAT IT CAN BE DONE
+   She is currently being "forced" per sei to make maps in order for the registration not to fail. Since I know you wanted this done (by me to begin with), I figured it was something that I could help with while code was running or something like that
+
+3) PHASE CORRECTION
+a) Firstly did we get the data? And can I see the code?
+	- Jacob did send the data :)
+	- Brian wrote most of the code
+
+b) When we're implementing the code, how will we know whether or not it can be applied retroactively? On that note, how exactly is it applied?
+	- May want to implement the corrections that Leigh is doing for the phase encode
+
+4) WHERE TO GO FROM HERE
+a) I think at this point it may be a good idea to focus a bit on number two - we should do some proof of principle stuff for the CS work
+
+b) Also, I think it may be a good idea to try to implement the paper that I'm doing for JC if we collectively think it's a good idea
+
+5) SEMINAR
+   I know we talked about this a bit last week but I would feel better if we could go over this again next week so I can solidify exactly what I plan on presenting and then have it ready for the Wednesday before my seminar, giving me a week to fix it.
+  - Didn't end up discussing this
+
   
+02.12.15
+Looking over Brian's Phase Correction Code - 11:30AM
+So, I can't seem to run it as I don't have the required modules apparently... I'm going to email Leigh about this and see if she can give me some sort of direction with respect to this because I don't want to spend an inordinate amount of time on it. From here, I think I'm going to work on some of the CS stuff. 
+
 
