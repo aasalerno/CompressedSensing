@@ -6,7 +6,7 @@ Dlow = 0.5e-3; % Low diffusion value
 Dhigh = 1e-3; % High diffusion value
 ndim = 3; % Number of dimensions for the data
 slp = 1; % For the line filter if we use it
-sampFac = 0.50;
+sampFac = 0.33;
 
 l1 = ones(sz)*Dhigh;
 l2 = ones(sz)*Dhigh;
@@ -29,7 +29,7 @@ data = ones(sz);
 
 
 if ispc()
-    gvdir = load('/micehome/asalerno/Documents/GradientVector.txt');
+    gvdir = load('C:\Users\saler_000\Documents\GitHub\CompressedSensing\GradientVector.txt');
 elseif isunix()
     gvdir = load('/projects/muisjes/asalerno/CS/Code/CompressedSensing/GradientVector.txt');
 else
@@ -59,23 +59,23 @@ l2low = 0.5e-3;
 disp('Building Diffusion Map')
 if strcmp(sty,'lin')
     % This will build the linear diffusion mask
-%     
-%     fil = linefilt(P.D,slp,0.25);
-%     th = atan(slp);
-%     for i = 1:sz
-%         for j = 1:sz
-%             if fil(i,j)
-%                 P.D(i,j) = Dhigh;
-%                 l1(i,j) = l1high;
-%                 v1(i,j,:) = [cos(th) sin(th)];
-%                 v2(i,j,:) = [-sin(th) cos(th)]; % Ensure orthogonality
-%             else
-%                 P.D(i,j) = Dlow;
-%                 v1(i,j,:) = [1 0];
-%                 v2(i,j,:) = [0 1];
-%             end
-%         end
-%     end
+    %
+    %     fil = linefilt(P.D,slp,0.25);
+    %     th = atan(slp);
+    %     for i = 1:sz
+    %         for j = 1:sz
+    %             if fil(i,j)
+    %                 P.D(i,j) = Dhigh;
+    %                 l1(i,j) = l1high;
+    %                 v1(i,j,:) = [cos(th) sin(th)];
+    %                 v2(i,j,:) = [-sin(th) cos(th)]; % Ensure orthogonality
+    %             else
+    %                 P.D(i,j) = Dlow;
+    %                 v1(i,j,:) = [1 0];
+    %                 v2(i,j,:) = [0 1];
+    %             end
+    %         end
+    %     end
     
 elseif strcmp(sty,'circ')
     fil = circfilt(P.D,0.5) - circfilt(P.D,0.40);
@@ -139,60 +139,80 @@ if ndim == 3
 end
 
 disp('Solving for signal values with S0 = 1');
-safeData = exp(-b.*Deff)+0.01*randn(size(Deff));
-
-
-for cc = 1:3
-diffData = safeData;
-
-dataSave = zeros(4,sz,sz);
-
-disp('Creating and saving data')
-tic
-for i = 1:size(diffData,1)
-    
-    diffData(i,:,:) = reshape(fftshift(fft2(squeeze(diffData(i,:,:)))),size(diffData(i,:,:)));
-    
-    if cc == 1 % Par
-        fil = reshape(linefilt(squeeze(diffData(i,:,:)),-gvdir(i,2)/gvdir(i,1),sampFac),size(diffData(i,:,:)));
-        uns = 'Par_';
-    elseif cc == 2 % Per
-        fil = reshape(linefilt(squeeze(diffData(i,:,:)),gvdir(i,1)/gvdir(i,2),sampFac),size(diffData(i,:,:)));
-        uns = 'Per_';
-    elseif cc == 3 % No undersample
-        fil = ones(1,sz,sz);
-        uns = '';
-    end
-    
-    
-    
-    diffData(i,:,:) = reshape(ifft2(squeeze(diffData(i,:,:).*fil)),size(diffData(i,:,:)));
-    
-    for j = 1:size(dataSave,1)
-        dataSave(j,:,:) = diffData(i,:,:);
-    end
-    
-    
-   
-    
-    
-
-    [datamin,datamax] = mincmaxmin(abs(dataSave),3);
-    if i<10
-        stri = ['0' num2str(i)];
-    else
-        stri = num2str(i);
-    end
-    disp(['Writing ' stri ' out of 30'])
-    disp(['Writing to /projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
-    mincwrite('/micehome/asalerno/Documents/CompressedSensing/simulations/test.mnc',...
-        ['/projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc'],...
-        abs(dataSave),datamax,datamin)
+safeData = exp(-b.*Deff);
+[x,y] = meshgrid(linspace(-1,1,sz),linspace(-1,1,sz));
+r = sqrt(x.^2+y.^2);
+r = r <= 1;
+for i = 1:30
+    ruse(i,:,:) = reshape(r,[1 size(r)]);
 end
-toc
-end
+safeData = ruse.*safeData;
 
-if 1 == 1
+%for cc = 1:3
+cc = 5;
+    diffData = safeData;
+    
+    dataSave = zeros(4,sz,sz);
+    
+    disp('Creating and saving data')
+    tic
+    for i = 1:size(diffData,1)
+        
+        diffData(i,:,:) = reshape(fftshift(fft2(squeeze(diffData(i,:,:)))),size(diffData(i,:,:)));
+        
+        if cc == 1 % Par
+            fil = reshape(linefilt(squeeze(diffData(i,:,:)),-gvdir(i,2)/gvdir(i,1),sampFac),size(diffData(i,:,:)));
+            uns = 'Par_';
+        elseif cc == 2 % Per
+            fil = reshape(linefilt(squeeze(diffData(i,:,:)),gvdir(i,1)/gvdir(i,2),sampFac),size(diffData(i,:,:)));
+            uns = 'Per_';
+        elseif cc == 3 % No undersample
+            fil = ones(1,sz,sz);
+            uns = '';
+        elseif cc == 4;
+            fil = reshape(circfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
+            uns = '';
+        elseif cc == 5;
+            fil = reshape(circfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
+            uns = 'Square';
+        end
+        
+        
+        
+        diffData(i,:,:) = reshape(ifft2(squeeze(diffData(i,:,:).*fil)),size(diffData(i,:,:)));
+        
+        for j = 1:size(dataSave,1)
+            dataSave(j,:,:) = diffData(i,:,:);
+        end
+        
+        
+        
+        
+        
+        
+        [datamin,datamax] = mincmaxmin(abs(dataSave),3);
+        if i<10
+            stri = ['0' num2str(i)];
+        else
+            stri = num2str(i);
+        end
+        disp(['Writing ' stri ' out of 30'])
+        if isunix()
+            disp(['Writing to /projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
+            mincwrite('/micehome/asalerno/Documents/CompressedSensing/simulations/test.mnc',...
+                ['/projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc'],...
+                abs(dataSave),datamax,datamin)
+        elseif ispc()
+            disp(['Writing to C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
+            mincwrite('C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\test.mnc',...
+                ['C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick\small_' uns 'Circ.' stri '.mnc'],...
+                abs(dataSave),datamax,datamin)
+        end
+    end
+    toc
+%end
+
+if 1 == 0
     system(['OCCIviewer /projects/muisjes/asalerno/CS/data/simulation/Circ/' num2str(round(100*sampFac)) '_10thick/small_Circ.10.mnc ' ...
         '/projects/muisjes/asalerno/CS/data/simulation/Per_Circ/' num2str(round(100*sampFac)) '_10thick/small_Per_Circ.10.mnc ' ...
         '/projects/muisjes/asalerno/CS/data/simulation/Par_Circ/' num2str(round(100*sampFac)) '_10thick/small_Par_Circ.10.mnc']);
