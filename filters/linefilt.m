@@ -15,6 +15,8 @@ for i = 1:s(1)
         if (isnan(slp)||isinf(abs(slp)))
             if abs(x(i,j)) < wid
                 data(i,j) = 1;
+            elseif abs(x(i,j)) < 1.1*wid
+                data(i,j) = cos(2*pi*(2.5/wid)*abs(x(i,j))).^2;
             else 
                 data(i,j) = 0;
             end
@@ -22,6 +24,8 @@ for i = 1:s(1)
         else
             if point_to_line([x(i,j),y(i,j),0],lnpts(1,:),lnpts(2,:)) < wid
                 data(i,j) = 1;
+            elseif point_to_line([x(i,j),y(i,j),0],lnpts(1,:),lnpts(2,:)) < 1.1*wid
+                data(i,j) = cos(2*pi*(2.5/wid)*point_to_line([x(i,j),y(i,j),0],lnpts(1,:),lnpts(2,:))).^2;
             else
                 data(i,j) = 0;
             end
