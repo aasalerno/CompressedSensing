@@ -150,66 +150,72 @@ safeData = ruse.*safeData;
 
 %for cc = 1:3
 cc = 5;
-    diffData = safeData;
+diffData = safeData;
+
+dataSave = zeros(4,sz,sz);
+
+disp('Creating and saving data')
+tic
+for i = 1:size(diffData,1)
     
-    dataSave = zeros(4,sz,sz);
+    diffData(i,:,:) = reshape(fftshift(fft2(squeeze(diffData(i,:,:)))),size(diffData(i,:,:)));
     
-    disp('Creating and saving data')
-    tic
-    for i = 1:size(diffData,1)
-        
-        diffData(i,:,:) = reshape(fftshift(fft2(squeeze(diffData(i,:,:)))),size(diffData(i,:,:)));
-        
-        if cc == 1 % Par
-            fil = reshape(linefilt(squeeze(diffData(i,:,:)),-gvdir(i,2)/gvdir(i,1),sampFac),size(diffData(i,:,:)));
-            uns = 'Par_';
-        elseif cc == 2 % Per
-            fil = reshape(linefilt(squeeze(diffData(i,:,:)),gvdir(i,1)/gvdir(i,2),sampFac),size(diffData(i,:,:)));
-            uns = 'Per_';
-        elseif cc == 3 % No undersample
-            fil = ones(1,sz,sz);
-            uns = '';
-        elseif cc == 4;
-            fil = reshape(circfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
-            uns = '';
-        elseif cc == 5;
-            fil = reshape(circfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
-            uns = 'Square';
-        end
-        
-        
-        
-        diffData(i,:,:) = reshape(ifft2(squeeze(diffData(i,:,:).*fil)),size(diffData(i,:,:)));
-        
-        for j = 1:size(dataSave,1)
-            dataSave(j,:,:) = diffData(i,:,:);
-        end
-        
-        
-        
-        
-        
-        
-        [datamin,datamax] = mincmaxmin(abs(dataSave),3);
-        if i<10
-            stri = ['0' num2str(i)];
-        else
-            stri = num2str(i);
-        end
-        disp(['Writing ' stri ' out of 30'])
-        if isunix()
-            disp(['Writing to /projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
-            mincwrite('/micehome/asalerno/Documents/CompressedSensing/simulations/test.mnc',...
-                ['/projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc'],...
-                abs(dataSave),datamax,datamin)
-        elseif ispc()
-            disp(['Writing to C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
-            mincwrite('C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\test.mnc',...
-                ['C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick\small_' uns 'Circ.' stri '.mnc'],...
-                abs(dataSave),datamax,datamin)
-        end
+    if cc == 1 % Par
+        fil = reshape(linefilt(squeeze(diffData(i,:,:)),-gvdir(i,2)/gvdir(i,1),sampFac),size(diffData(i,:,:)));
+        uns = 'Par_';
+    elseif cc == 2 % Per
+        fil = reshape(linefilt(squeeze(diffData(i,:,:)),gvdir(i,1)/gvdir(i,2),sampFac),size(diffData(i,:,:)));
+        uns = 'Per_';
+    elseif cc == 3 % No undersample
+        fil = ones(1,sz,sz);
+        uns = '';
+    elseif cc == 4;
+        fil = reshape(circfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
+        uns = '';
+    elseif cc == 5;
+        fil = reshape(sqfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
+        uns = 'Square';
+    elseif cc == 6;
+        fil = reshape(elpsfilt(squeeze(diffData(i,:,:)),-gvdir(i,2)/gvdir(i,1),sampFac,2),[1 sz sz]);
+        uns = 'Elps_Par';
+    elseif cc == 7
+        fil = reshape(elpsfilt(squeeze(diffData(i,:,:)),gvdir(i,1)/gvdir(i,2),sampFac,2),[1 sz sz]);
+        uns = 'Elps_Per';
     end
-    toc
+    
+    
+    
+    diffData(i,:,:) = reshape(ifft2(squeeze(diffData(i,:,:).*fil)),size(diffData(i,:,:)));
+    
+    for j = 1:size(dataSave,1)
+        dataSave(j,:,:) = diffData(i,:,:);
+    end
+    
+    
+    
+    
+    
+    
+    [datamin,datamax] = mincmaxmin(abs(dataSave),3);
+    if i<10
+        stri = ['0' num2str(i)];
+    else
+        stri = num2str(i);
+    end
+    disp(['Writing ' stri ' out of 30'])
+    if isunix()
+        disp(['Writing to /projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
+        mincwrite('/micehome/asalerno/Documents/CompressedSensing/simulations/test.mnc',...
+            ['/projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc'],...
+            abs(dataSave),datamax,datamin)
+    elseif ispc()
+        disp(['Writing to C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
+        mincwrite('C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\test.mnc',...
+            ['C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick\small_' uns 'Circ.' stri '.mnc'],...
+            abs(dataSave),datamax,datamin)
+    end
+end
+toc
 %end
 
 if 1 == 0
