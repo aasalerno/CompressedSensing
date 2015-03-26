@@ -1,4 +1,4 @@
-function diff = usRMS(ref,cmp,dirs)
+function diff = usRMS(ref,cmp,dirs,ROI)
 
 
 data = [];
@@ -12,7 +12,7 @@ for i = 1:dirs
     refDat = mincmap([ref '.' stri '.mnc']);
     cmpDat = mincmap([cmp '.' stri '.mnc']); % read in the info for one direction
     
-    if i == 1;
+    if i == 1 && (isempty(ROI) || ~any(ROI(:)));
         fil = logical(circfilt(squeeze(refDat(i,:,:)),0.7) - circfilt(squeeze(refDat(i,:,:)),0.4));
     end
     
