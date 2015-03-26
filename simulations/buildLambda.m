@@ -6,7 +6,7 @@ Dlow = 0.5e-3; % Low diffusion value
 Dhigh = 1e-3; % High diffusion value
 ndim = 3; % Number of dimensions for the data
 slp = 1; % For the line filter if we use it
-sampFac = 0.33;
+sampFac = 0.50;
 
 l1 = ones(sz)*Dhigh;
 l2 = ones(sz)*Dhigh;
@@ -149,7 +149,7 @@ end
 safeData = ruse.*safeData;
 
 %for cc = 1:3
-cc = 5;
+cc = 6;
 diffData = safeData;
 
 dataSave = zeros(4,sz,sz);
@@ -168,10 +168,10 @@ for i = 1:size(diffData,1)
         uns = 'Per_';
     elseif cc == 3 % No undersample
         fil = ones(1,sz,sz);
-        uns = '';
+        uns = 'Full';
     elseif cc == 4;
         fil = reshape(circfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
-        uns = '';
+        uns = 'Circ';
     elseif cc == 5;
         fil = reshape(sqfilt(squeeze(diffData(i,:,:)),4*sampFac),[1 sz sz]);
         uns = 'Square';
@@ -206,12 +206,12 @@ for i = 1:size(diffData,1)
     if isunix()
         disp(['Writing to /projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
         mincwrite('/micehome/asalerno/Documents/CompressedSensing/simulations/test.mnc',...
-            ['/projects/muisjes/asalerno/CS/data/simulation/' uns 'Circ/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc'],...
+            ['/projects/muisjes/asalerno/CS/data/simulation/' uns '/' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc'],...
             abs(dataSave),datamax,datamin)
     elseif ispc()
         disp(['Writing to C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick/small_' uns 'Circ.' stri '.mnc']);
         mincwrite('C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\test.mnc',...
-            ['C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns 'Circ\' num2str(round(100*sampFac)) '_10thick\small_' uns 'Circ.' stri '.mnc'],...
+            ['C:\Users\saler_000\Documents\GitHub\CompressedSensing\simulations\' uns '\' num2str(round(100*sampFac)) '_10thick\small_' uns 'Circ.' stri '.mnc'],...
             abs(dataSave),datamax,datamin)
     end
 end
