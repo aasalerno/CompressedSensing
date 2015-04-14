@@ -20,6 +20,9 @@ diffs = zeros(1,length(dirNames));
 
 ref = [typ 'Full.' num2str(brain)];
 
+tmploc = find(strcmp('Full',dirNames));
+dirNames = circshift(dirNames,[0,tmploc]);
+
 for i = 1:length(dirNames)
     disp(dirNames{i})
     cmp = [typ dirNames{i} '.' num2str(brain)];
