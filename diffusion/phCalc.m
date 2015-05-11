@@ -21,6 +21,6 @@ else
     F = fspecial('gaussian',[5 5],2);
     filtdata = imfilter(data,F,'same');
 %    imshow(filtdata);
-    ph = conj(filtdata)./abs(filtdata);
+    ph = conj(filtdata)./(abs(filtdata)+eps);
 %    ph = conj(data)./abs(data);
 end
