@@ -1,4 +1,4 @@
-function ph = phCalc(data,rl)
+function ph = phCalc(data,rl,isksp)
 % This code will calculate the phase for the data -- it will use different
 % styles of calculation depending on if the data is real or complex.
 %
@@ -6,8 +6,10 @@ function ph = phCalc(data,rl)
 % rl   - Logical. Is the data real?
 
 if nargin < 2; rl = isreal(data); end
-data = ifftshift(ifft2(data));
-N = size(data);
+if isksp
+    data = ifftshift(ifft2(data));
+    N = size(data);
+end
 
 if rl
     disp('Lustig''s way')
@@ -16,9 +18,9 @@ if rl
     ph = exp(1i*angle((ifft2c(data.*phmask))));
 else
     disp('Brian''s Way')
-%     F = fspecial('gaussian',[5 5],2);
-%     filtdata = imfilter(data,F,'same');
-%     imshow(filtdata);
-%    ph = conj(filtdata)./abs(filtdata);
-    ph = conj(data)./abs(data);
+    F = fspecial('gaussian',[5 5],2);
+    filtdata = imfilter(data,F,'same');
+%    imshow(filtdata);
+    ph = conj(filtdata)./abs(filtdata);
+%    ph = conj(data)./abs(data);
 end
