@@ -7,10 +7,15 @@ gradObj = gOBJ(x,params);
 if params.xfmWeight
     gradXFM = gXFM(x,params);
 end
+
 if params.TVWeight
     gradTV = gTV(x,params);
 end
 
+if exist('params.dirWeight','var') && params.dirWeight
+   gradDir = gDir(x,params);
+end
 
-grad = (gradObj +  params.xfmWeight.*gradXFM + params.TVWeight.*gradTV);
+grad = (gradObj + params.xfmWeight.*gradXFM + params.TVWeight.*gradTV ...
+                + params.dirWeight.*gradDir);
 
