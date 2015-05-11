@@ -1,0 +1,50 @@
+This is an implementation of Compressed Sensing reconstruction for MRI data.
+It implements the non-linear conjugate sub-gradient algorithm as described in 
+the paper "Sparse MRI: The Application of Compressed Sensing for Rapid MR Imaging", 2007
+Magn Res Med, In Press.
+
+
+The code is not optimized and is given for educational purpose.
+
+The demos implement some of the examples given in the paper. More examples
+will be added in time. 
+
+demo_SheppLoganTV.m  demonstrate the example first presented by Candes romberg and Tao.
+
+demo_angio_simulation.m demonstrates a simulation of an angiography-like phantom
+
+demo_angio.m demostrates a reconstruction of 3DFT ssfp T2-prep angio data that was 2-fold undersampled
+
+demo_SheppLoganTV_vdSpiral.m  demostrates how to use non-Cartesian trajectories. For this, you
+				MUST have Jeffery Fessler's min-max NUFFT code.
+				(http://www.eecs.umich.edu/~fessler/code/index.html)
+
+
+demo_Brain_2D.m  demonstrate an L1-wavelet reconstruction of a brain image.
+		 In order to try this demo, you need to install Wavelab
+		 (http://www-stat.stanford.edu/~wavelab/)
+
+
+
+demo_phantom_denoising.m demonstrates CS reconstruction in the presence of noise
+
+
+demo_thresholding.m Demonstrates the sparsity of images by the thresholding experiment as described
+			in the paper.
+
+
+
+*** This is a first rough draft of the code. More examples/documentation will be added in time ***
+*** We tried as much a possible to make sure that all the functions that are needed are present ***
+*** However, if you are missing some, please contact Miki.                                       ***
+
+
+If you have any questions/comments, feel free to contact Michael (Miki)  Lustig at: mlustig at stanford dot edu
+
+http://www.mlustig.com
+
+
+Enjoy!
+
+
+
