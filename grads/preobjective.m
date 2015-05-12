@@ -35,7 +35,7 @@ if isfield(params,'dirWeight') && params.dirWeight ~= 0
     for kk = 1:size(x,3)
         x1 = squeeze(x(:,:,kk));
         dx1 = squeeze(dx(:,:,kk));
-        XFMtx(:,:,:,kk) = (params.XFM'*x1);
-        XFMtdx(:,:,:,kk) = (params.XFM'*dx1);
+        XFMtx(:,:,kk) = (params.XFM'*x1);
+        XFMtdx(:,:,kk) = (params.XFM'*dx1);
     end
 end
