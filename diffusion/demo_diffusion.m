@@ -4,11 +4,23 @@ rand('twister',2000);
 addpath(strcat(pwd,'/utils'));
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DATA LOADING and PREALLOCATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % The image should be a 3D stack of different directions
 % This file is *complex* data from all 30 directions from Brain #6 of
+
 % Jacob's data from July. Variable is "im"
 load brain6-zpad.mat
+
+% This one is for reality checking
+% load brain.6.01-zpad.mat
+
 N = size(im);
+if length(N) == 2
+    N = [N 1];
+end
 DN = [N(1) N(2)];
 data = zeros(N);
 im_dc = zeros(N);
@@ -37,6 +49,14 @@ filename = '/micehome/asalerno/Documents/CompressedSensing/GradientVectorMag.txt
 thresh = 0.25; % Minimum dot product we'll accept
 sigma = 2; % Standard deviation of the gaussian to control thickness (this is the weight)
 
+% Check to make sure that the number of directions is the same as number of
+% slices (one per direction) in our stack!
+% Comment this out when doing reality checks
+dimcheck = load(filename);
+if (isempty(find(size(dimcheck) == N(3),1))) && dirWeight ~= 0
+    error('The data does not comply with the number of directions')
+end
+
 % generate variable density random sampling
 pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
 k = genSampling(pdf,10,60);		% generates a sampling pattern
@@ -47,7 +67,6 @@ k = genSampling(pdf,10,60);		% generates a sampling pattern
 XFM = Wavelet('Daubechies',6,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
-
 
 
 
@@ -62,9 +81,6 @@ for kk=1:N(3)
     res(:,:,kk) = reshape(XFM*(squeeze(im_dc(:,:,kk))./pdf),[N(1) N(2) 1]);
 end
 
-% Do weighting calculation
-[param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma);
-
 % initialize Parameters for reconstruction
 param = init;
 param.FT = trans.FT;
@@ -75,6 +91,7 @@ param.TVWeight =TVWeight;     % TV penalty
 param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
 param.Itnlim = Itnlim;
+[param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma);
 
 tic
 for n=1:8
