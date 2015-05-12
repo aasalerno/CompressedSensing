@@ -41,7 +41,7 @@ XFM = Wavelet('Daubechies',6,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
 
-for kk=1:30
+for kk=1:N(3)
     % calculate the phase:
     ph = phCalc(squeeze(im(:,:,kk)),0,0);
     % FT
@@ -55,7 +55,7 @@ end
 
 % initialize Parameters for reconstruction
 param = init;
-param.FT = FT;
+param.FT = trans.FT;
 param.XFM = XFM;
 param.TV = TVOP;
 param.data = data;
@@ -63,3 +63,14 @@ param.TVWeight =TVWeight;     % TV penalty
 param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
 param.Itnlim = Itnlim;
+
+tic
+for n=1:8
+	res = fnlCg(res,param);
+	im_res = XFM'*res;
+	%figure(100), imshow(abs(im_res),[]), drawnow
+    figure(2)
+    subplot(2,4,n)
+    imshow(abs(im_res),[])
+end
+toc

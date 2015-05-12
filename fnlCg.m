@@ -30,11 +30,11 @@ k = 0;
 t = 1;
 
 % copmute g0  = grad(Phi(x))
-
-g0 = wGradient(x,params);
-
+g0 = zeros(size(x));
+for kk=size(x,3)
+    g0(:,kk) = wGradient(x(:,:,kk),params);
+end
 dx = -g0;
-
 
 % iterations
 while(1)
