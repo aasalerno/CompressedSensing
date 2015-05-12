@@ -36,7 +36,7 @@ res = zeros(N);
 % Direction Recon Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 filename = '/micehome/asalerno/Documents/CompressedSensing/GradientVectorMag.txt'; % Vector file
-thresh = 0.25; % Minimum dot product we'll accept
+thresh = 0.8; % Minimum dot product we'll accept
 sigma = 2; % Standard deviation of the gaussian to control thickness (this is the weight)
 dirWeight = 0.01;   % Weight for directionally similar penalty
 
