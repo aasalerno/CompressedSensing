@@ -30,6 +30,13 @@ xfmWeight = 0.1;	% Weight for Transform L1 penalty
 dirWeight = 0.01;   % Weight for directionally similar penalty
 Itnlim = 8;		% Number of iterations
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Direction Recon Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+filename = '/micehome/asalerno/Documents/CompressedSensing/GradientVectorMag.txt'; % Vector file
+thresh = 0.25; % Minimum dot product we'll accept
+sigma = 2; % Standard deviation of the gaussian to control thickness (this is the weight)
+
 % generate variable density random sampling
 pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
 k = genSampling(pdf,10,60);		% generates a sampling pattern
@@ -40,6 +47,9 @@ k = genSampling(pdf,10,60);		% generates a sampling pattern
 XFM = Wavelet('Daubechies',6,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
+
+
+
 
 for kk=1:N(3)
     % calculate the phase:
@@ -52,6 +62,8 @@ for kk=1:N(3)
     res(:,:,kk) = reshape(XFM*(squeeze(im_dc(:,:,kk))./pdf),[N(1) N(2) 1]);
 end
 
+% Do weighting calculation
+[param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma);
 
 % initialize Parameters for reconstruction
 param = init;
