@@ -4,6 +4,7 @@ gradXFM = 0;
 gradTV = 0;
 
 gradObj = gOBJ(x,params);
+
 if params.xfmWeight
     gradXFM = gXFM(x,params);
 end
