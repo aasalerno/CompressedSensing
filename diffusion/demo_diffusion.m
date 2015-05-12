@@ -12,7 +12,13 @@ addpath(strcat(pwd,'/utils'));
 % This file is *complex* data from all 30 directions from Brain #6 of
 
 % Jacob's data from July. Variable is "im"
+
+% padded in image space
 load brain6-zpad.mat
+
+% padded in k-space
+% load brain6-zpad-ksp.mat
+
 
 % This one is for reality checking
 % load brain.6.01-zpad.mat
@@ -32,6 +38,7 @@ res = zeros(N);
 filename = '/micehome/asalerno/Documents/CompressedSensing/GradientVectorMag.txt'; % Vector file
 thresh = 0.25; % Minimum dot product we'll accept
 sigma = 2; % Standard deviation of the gaussian to control thickness (this is the weight)
+dirWeight = 0.01;   % Weight for directionally similar penalty
 
 % Check to make sure that the number of directions is the same as number of
 % slices (one per direction) in our stack!
@@ -53,7 +60,6 @@ pctg = [0.25];  	% undersampling factor
 P = 5;			% Variable density polymonial degree
 TVWeight = 0.01; 	% Weight for TV penalty
 xfmWeight = 0.1;	% Weight for Transform L1 penalty
-dirWeight = 0.01;   % Weight for directionally similar penalty
 Itnlim = 8;		% Number of iterations
 
 % generate variable density random sampling
@@ -77,7 +83,7 @@ for kk=1:N(3)
     FT = trans.FT{kk};
     data(:,:,kk) = reshape(FT*squeeze(im(:,:,kk)),[N(1) N(2) 1]);
     im_dc(:,:,kk) = reshape(FT'*(squeeze(data(:,:,kk))./pdf),[N(1) N(2) 1]);
-    res(:,:,kk) = reshape(XFM*(squeeze(im_dc(:,:,kk))./pdf),[N(1) N(2) 1]);
+    res(:,:,kk) = reshape(XFM*(squeeze(im_dc(:,:,kk))),[N(1) N(2) 1]);
 end
 % ---------------------------
 
@@ -92,8 +98,10 @@ param.TVWeight =TVWeight;     % TV penalty
 param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
 param.Itnlim = Itnlim;
-[param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma); % AS
 
+if param.dirWeight
+    [param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma); % AS
+end
 tic
 for n=1:8
 	res = fnlCg(res,param);
