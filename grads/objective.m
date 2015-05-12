@@ -68,9 +68,10 @@ if params.dirWeight
         % How shall I sum them?
         % Each diff gets it's own
         res = sum(obj,1) + sum(params.xfmWeight(:).*XFM,1) + sum(params.TVWeight(:).*TV,1)...
-                         + params.dirWeight(:).*dirDiff;
+            + params.dirWeight(:).*dirDiff;
+        RMS = sqrt(obj/sum(abs(params.data(:))>0));
     else
-             
+        
         TV = sum(TV.*params.TVWeight(:));
         XFM = sum(XFM.*params.xfmWeight(:));
         dirDiff = sum(dir.*params.dirWeight(:));
@@ -78,6 +79,7 @@ if params.dirWeight
         
         
         res = obj + (TV) + (XFM) + (dirDiff);
+        RMS = sqrt(obj/sum(abs(params.data(:))>0));
     end
     
     
