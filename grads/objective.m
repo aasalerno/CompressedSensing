@@ -78,7 +78,7 @@ if params.dirWeight
         RMS = sqrt(obj/sum(abs(params.data(:))>0));
         
         
-        res = obj(:) + TV(:) + XFM(:) + dirDiff(:);
+        res = sum(obj(:) + TV(:) + XFM(:) + dirDiff(:));
     end
     
     
