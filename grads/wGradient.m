@@ -13,10 +13,11 @@ if params.TVWeight
     gradTV = gTV(x,params);
 end
 
-if exist('params.dirWeight','var') && params.dirWeight
+if isfield(params,'dirWeight') && params.dirWeight
    gradDir = gDir(x,params);
-end
-
-grad = (gradObj + params.xfmWeight.*gradXFM + params.TVWeight.*gradTV ...
+   grad = (gradObj + params.xfmWeight.*gradXFM + params.TVWeight.*gradTV ...
                 + params.dirWeight.*gradDir);
+else
+   grad = (gradObj + params.xfmWeight.*gradXFM + params.TVWeight.*gradTV);
+end
 

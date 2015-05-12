@@ -3,7 +3,11 @@ function grad = gTV(x,params)
 
 p = params.pNorm;
 
-Dx = params.TV*(params.XFM'*x);
+grad = zeros(size(x));
 
-G = p*Dx.*(Dx.*conj(Dx) + params.l1Smooth).^(p/2-1);
-grad = params.XFM*(params.TV'*G);
+for kk = 1:size(x,3)
+    x1 = squeeze(x(:,:,kk));
+    Dx = params.TV*(params.XFM'*x1);
+    G = p*Dx.*(Dx.*conj(Dx) + params.l1Smooth).^(p/2-1);
+    grad(:,:,kk) = params.XFM*(params.TV'*G);
+end

@@ -1,6 +1,5 @@
 function gradDir = gDir(x,params)
 % computes the gradient of data similarity
-tic
 
 dirPair = params.dirPair;
 wgt = params.dirPairWeight;
@@ -26,5 +25,5 @@ for kk = 1:30
     inRow = nums(any(kk == dirPair,2).*nums ~= 0);
     gradDir(:,:,kk) = sum(gradDirTot(:,:,inRow),3);
 end
-toc
+
 % Whole thing takes ~8 seconds.
