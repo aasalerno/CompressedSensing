@@ -26,4 +26,4 @@ for i=1:nv-1
     end
 end
 
-wgt = exp(-(vals.^2-1)./(2.*sigma.^2));
+wgt = exp(-(vals.^2-1)./(2.*sigma.^2))';
