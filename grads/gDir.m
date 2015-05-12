@@ -16,6 +16,8 @@ for kk = 1:N
     x1 = squeeze(x(:,:,i));
     x2 = squeeze(x(:,:,j));
     gradDirTot(:,:,kk) = params.XFM*(2.*wgt(kk).*(params.XFM'*x1-params.XFM'*x2));
+    % ASK BRIAN IF THIS IS OK
+    gradDirTot(:,:,kk) = params.XFM*(2.*wgt(kk).*(params.XFM'*(x1-x2)));
 end
 
 

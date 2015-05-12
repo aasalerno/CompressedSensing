@@ -26,22 +26,6 @@ data = zeros(N);
 im_dc = zeros(N);
 res = zeros(N);
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% L1 Recon Parameters
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%N = [256,256]; 		% image Size
-%DN = [256,256]; 	% data Size
-% N = [128 128];
-% DN = [128 128];
-pctg = [0.25];  	% undersampling factor
-P = 5;			% Variable density polymonial degree
-TVWeight = 0.01; 	% Weight for TV penalty
-xfmWeight = 0.1;	% Weight for Transform L1 penalty
-dirWeight = 0.01;   % Weight for directionally similar penalty
-Itnlim = 8;		% Number of iterations
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Direction Recon Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,19 +41,34 @@ if (isempty(find(size(dimcheck) == N(3),1))) && dirWeight ~= 0
     error('The data does not comply with the number of directions')
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% L1 Recon Parameters -- in normal
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%N = [256,256]; 		% image Size
+%DN = [256,256]; 	% data Size
+% N = [128 128];
+% DN = [128 128];
+pctg = [0.25];  	% undersampling factor
+P = 5;			% Variable density polymonial degree
+TVWeight = 0.01; 	% Weight for TV penalty
+xfmWeight = 0.1;	% Weight for Transform L1 penalty
+dirWeight = 0.01;   % Weight for directionally similar penalty
+Itnlim = 8;		% Number of iterations
+
 % generate variable density random sampling
 pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
 k = genSampling(pdf,10,60);		% generates a sampling pattern
 
-
 %generate transform operator
-
 XFM = Wavelet('Daubechies',6,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
 
+%  ------------- END
 
 
+% AS
 for kk=1:N(3)
     % calculate the phase:
     ph = phCalc(squeeze(im(:,:,kk)),0,0);
@@ -80,6 +79,8 @@ for kk=1:N(3)
     im_dc(:,:,kk) = reshape(FT'*(squeeze(data(:,:,kk))./pdf),[N(1) N(2) 1]);
     res(:,:,kk) = reshape(XFM*(squeeze(im_dc(:,:,kk))./pdf),[N(1) N(2) 1]);
 end
+% ---------------------------
+
 
 % initialize Parameters for reconstruction
 param = init;
@@ -91,7 +92,7 @@ param.TVWeight =TVWeight;     % TV penalty
 param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
 param.Itnlim = Itnlim;
-[param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma);
+[param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma); % AS
 
 tic
 for n=1:8
