@@ -56,7 +56,7 @@ if params.dirWeight
     end
     
     % Separate by diffusion direction?
-    if 1 == 1
+    if 1 == 0
         n = size(dirPair,1);
         nums = (1:n)';
         dirDiff = zeros(1,N(3));
@@ -78,7 +78,7 @@ if params.dirWeight
         RMS = sqrt(obj/sum(abs(params.data(:))>0));
         
         
-        res = obj + (TV) + (XFM) + (dirDiff);
+        res = obj(:) + TV(:) + XFM(:) + dirDiff(:);
     end
     
     
