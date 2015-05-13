@@ -23,7 +23,7 @@ end
 
 nums = (1:N)';
 
-for kk = 1:30
+for kk = 1:max(dirPair(:))
     inRow = nums(any(kk == dirPair,2).*nums ~= 0);
     gradDir(:,:,kk) = sum(gradDirTot(:,:,inRow),3);
 end
