@@ -17,7 +17,7 @@ if rl
     phmask = phmask/max(phmask(:));
     ph = exp(1i*angle((ifft2c(data.*phmask))));
 else
-    disp('Brian''s Way')
+    %disp('Brian''s Way')
     F = fspecial('gaussian',[5 5],2);
     filtdata = imfilter(data,F,'same');
 %    imshow(filtdata);
