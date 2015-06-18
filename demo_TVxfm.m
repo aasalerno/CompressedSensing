@@ -1,31 +1,14 @@
-% This is a script to test with diffusion data
-
+function [im_res,diffRMS] = demo_TVxfm(TVWeight,xfmWeight)
 rand('twister',2000);
 addpath(strcat(pwd,'/utils'));
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DATA LOADING and PREALLOCATION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% The image should be a 3D stack of different directions
-% This file is *complex* data from all 30 directions from Brain #6 of
-
-% Jacob's data from July. Variable is "im"
-
-% padded in image space
-% load brain6-zpad.mat
-
-% padded in k-space
-% load brain6-zpad-ksp.mat
-%generate image
- im = (phantom(N(1)))  + randn(N)*0.01 + i*randn(N)*0.01;
-%load brain6.1-zpad-ksp.mat
-im = im/max(im(:));
-
 % This one is for reality checking
 % load brain.6.01-zpad.mat
-
+load brain.6.1-zpad-ksp.mat
+%im = im/max(im(:));
+figure(1)
+imshow(abs(im),[])
 N = size(im);
 if length(N) == 2
     N = [N 1];
@@ -41,7 +24,7 @@ res = zeros(N);
 filename = '/micehome/asalerno/Documents/CompressedSensing/GradientVectorMag.txt'; % Vector file
 thresh = 0.9; % Minimum dot product we'll accept
 sigma = 2; % Standard deviation of the gaussian to control thickness (this is the weight)
-dirWeight = 0.00;   % Weight for directionally similar penalty
+dirWeight = 0;   % Weight for directionally similar penalty
 
 % Check to make sure that the number of directions is the same as number of
 % slices (one per direction) in our stack!
@@ -59,10 +42,10 @@ end
 %DN = [256,256]; 	% data Size
 % N = [128 128];
 % DN = [128 128];
-pctg = [0.25];  	% undersampling factor
+pctg = 0.25;  	% undersampling factor
 P = 5;			% Variable density polymonial degree
-TVWeight = 0.01; 	% Weight for TV penalty
-xfmWeight = 0.01;	% Weight for Transform L1 penalty
+% TVWeight = 0.01; 	% Weight for TV penalty
+% xfmWeight = 0.1;	% Weight for Transform L1 penalty
 Itnlim = 8;		% Number of iterations
 
 % generate variable density random sampling
@@ -101,7 +84,6 @@ param.TVWeight =TVWeight;     % TV penalty
 param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
 param.Itnlim = Itnlim;
-%param.lineSearchBeta = 0.3;
 
 if param.dirWeight
     [param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma); % AS
@@ -111,14 +93,14 @@ tic
 for n=1:8
     res = fnlCg(res,param);
 	im_res = XFM'*res(:,:,1);
-	%figure(100), imshow(abs(im_res),[]), drawnow
+% 	%figure(100), imshow(abs(im_res),[]), drawnow
     figure(3)
     subplot(2,4,n)
     imshow(abs(im_res),[])
 end
 toc
 
-% create a low-res mask
+% % create a low-res mask
 % mask_lr = genLRSampling_pctg(DN,pctg,1,0);
 % im_lr = ifft2c(zpad(fft2c(im).*mask_lr,N(1),N(2)));
 % 
@@ -142,6 +124,11 @@ toc
 % 
 % figure, plot(1:N(1), abs(im_full(end/2,:)),1:N(1), abs(im_lr(end/2,:)), 1:N(2), abs(im_dc(end/2,:)), 1:N(2), abs(im_res(end/2,:)),'LineWidth',2);
 % legend('original', 'LR', 'zf-w/dc', 'TV');
-% 
 
 
+diffRMS = rms(im(:)-im_res(:));
+
+% w = whos;
+% for a = 1:length(w)
+% outs.(w(a).name) = eval(w(a).name);
+% end

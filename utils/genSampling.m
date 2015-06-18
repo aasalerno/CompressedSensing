@@ -17,7 +17,7 @@ function [minIntrVec,stat,actpctg] = genSampling(pdf,iter,tol)
 %
 %	(c) Michael Lustig 2007
 
-h = waitbar(0);
+%h = waitbar(0);
 
 pdf(find(pdf>1)) = 1;
 K = sum(pdf(:));
@@ -37,11 +37,11 @@ for n=1:iter
 		minIntrVec = tmp;
 	end
 	stat(n) = max(abs(TMP(2:end)));
-	waitbar(n/iter,h);
+% 	waitbar(n/iter,h);
 end
 
 actpctg = sum(minIntrVec(:))/prod(size(minIntrVec));
 
-close(h);
+%close(h);
 
 

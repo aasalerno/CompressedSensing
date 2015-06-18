@@ -37,25 +37,26 @@ t = 1;
 
 g0 = wGradient(x,params);
 dx = -g0;
-
+%test = 0;
 % iterations
+
 while(1)
-    
+tic    
     % backtracking line-search
     
     % pre-calculate values, such that it would be cheap to compute the objective
     % many times for efficient line-search
-    [FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx] = preobjective(x, dx, params);
-    f0 = objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,x,dx, 0, params);
+    [FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx] = preobjective(x, dx, params);
+    f0 = objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx, x,dx, 0, params);
     t = t0;
-    [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,x,dx, t, params);
+    [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx, x,dx, t, params);
     
     lsiter = 0;
     
     while (f1 > f0 - alpha*t*abs(g0(:)'*dx(:))) & (lsiter<maxlsiter)
         lsiter = lsiter + 1;
         t = t * beta;
-        [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,x,dx, t, params);
+        [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,XFMtx, XFMtdx,x,dx, t, params);
     end
     
     if lsiter == maxlsiter
@@ -74,8 +75,9 @@ while(1)
     
     x = (x + t*dx);
     
+    
     %--------- uncomment for debug purposes ------------------------
-    % disp(sprintf('%d   , obj: %f, RMS: %f, L-S: %d', k,f1,RMSerr,lsiter));
+    fprintf('k = %1.0f, obj: %3e, RMS: %3e, L-S: %1.0f \n',k,f1,RMSerr,lsiter);
     
     %---------------------------------------------------------------
     
@@ -88,8 +90,12 @@ while(1)
     k = k + 1;
     
     %TODO: need to "think" of a "better" stopping criteria ;-)
-    if (k > params.Itnlim) | (norm(dx(:)) < gradToll)
+    if (k > params.Itnlim) | (norm(dx(:))/numel(dx) < gradToll)
         break;
+    else
+   %     toc
+   %     disp(num2str(norm(dx(:))/numel(dx)));
+   %     test = test+1;
     end
     
 end

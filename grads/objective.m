@@ -18,30 +18,34 @@ for kk = 1:N(3)
 end
 
 if params.TVWeight
-    TV = zeros(N(1)*N(2)*2,N(3));
-    for kk = 1:N(3)
-        DXFMtx1 = DXFMtx(:,:,:,kk);
-        DXFMtdx1 = DXFMtdx(:,:,:,kk);
-        w = DXFMtx1(:) + t*DXFMtdx1(:);
-        TV(:,kk) = (w.*conj(w)+params.l1Smooth).^(p/2);
-    end
+%     TV = zeros(N(1)*N(2)*2,N(3));
+%     for kk = 1:N(3)
+%         DXFMtx1 = DXFMtx(:,:,:,kk);
+%         DXFMtdx1 = DXFMtdx(:,:,:,kk);
+%         w = DXFMtx1(:) + t*DXFMtdx1(:);
+%         TV(:,kk) = (w.*conj(w)+params.l1Smooth).^(p/2);
+%     end
+    w = reshape(DXFMtx + t*DXFMtdx,[N(1)*N(2)*2,N(3)]);
+    TV = (w.*conj(w)+params.l1Smooth).^(p/2);
 else
     TV = 0;
 end
 
 if params.xfmWeight
-    XFM = zeros(N(1)*N(2),N(3));
-    for kk = 1:N(3)
-        x1 = x(:,:,kk);
-        dx1 = dx(:,:,kk);
-        w = x1(:) + t*dx1(:);
-        XFM(:,kk) = (w.*conj(w)+params.l1Smooth).^(p/2);
-    end
+    %   XFM = zeros(N(1)*N(2),N(3));
+    %     for kk = 1:N(3)
+    %         x1 = x(:,:,kk);
+    %         dx1 = dx(:,:,kk);
+    %         w = x1(:) + t*dx1(:);
+    %         XFM(:,kk) = (w.*conj(w)+params.l1Smooth).^(p/2);
+    %     end
+    w = reshape(x + t*dx,[N(1)*N(2),N(3)]);
+    XFM = (w.*conj(w)+params.l1Smooth).^(p/2);
 else
     XFM=0;
 end
 
-if params.dirWeight
+if isfield(params,'dirWeight') && params.dirWeight~=0
     wgt = params.dirPairWeight;
     dirPair = params.dirPair;
     n = length(wgt);
@@ -50,9 +54,9 @@ if params.dirWeight
         Xi = XFMtx(:,:,dirPair(kk,1));
         DXi = XFMtdx(:,:,dirPair(kk,1));
         Xj = XFMtx(:,:,dirPair(kk,2));
-        DXj = XFMtdx(:,:,dirPair(kk,2));
-        val = wgt(kk).*(Xi(:) + t*DXi(:) - Xj(:) - t*DXj(:));
-        dir(kk) = val(:)'*val(:);
+        %DXj = XFMtdx(:,:,dirPair(kk,2));
+        val = (Xi(:) + t*DXi(:) - Xj(:));
+        dir(kk) = wgt(kk).*(val'*val);
     end
     
     % Separate by diffusion direction?
@@ -60,7 +64,7 @@ if params.dirWeight
         n = size(dirPair,1);
         nums = (1:n)';
         dirDiff = zeros(1,N(3));
-        for kk = 1:30
+        for kk = 1:max(dirPair(:))
             inRow = nums(any(kk == dirPair,2).*nums ~= 0);
             dirDiff(kk) = sum(dir(inRow),2);
         end
@@ -69,6 +73,7 @@ if params.dirWeight
         % Each diff gets it's own
         res = sum(obj,1) + sum(params.xfmWeight(:).*XFM,1) + sum(params.TVWeight(:).*TV,1)...
             + params.dirWeight(:).*dirDiff;
+
         RMS = sqrt(obj/sum(abs(params.data(:))>0));
     else
         
@@ -79,6 +84,12 @@ if params.dirWeight
         
         
         res = sum(obj(:) + TV(:) + XFM(:) + dirDiff(:));
+        fprintf('Objective: %1.3e \n',(sum(obj(:))))
+        fprintf('XFM: %1.3e \n',(sum(XFM(:))))
+        fprintf('TV: %1.3e \n',(sum(TV(:))))
+        fprintf('Directions: %1.3e \n',(sum(dirDiff(:))))
+        obj = sum(obj);
+        RMS = sum(RMS);
     end
     
     
@@ -86,8 +97,8 @@ else % If dirWeight doesn't exist.
     
     TV = sum(TV.*params.TVWeight(:));
     XFM = sum(XFM.*params.xfmWeight(:));
-    RMS = sqrt(obj/sum(abs(params.data(:))>0));
+    RMS = sum(sqrt(obj/sum(abs(params.data(:))>0)));
     
     
-    res = obj + (TV) + (XFM) ;
+    res = sum(obj(:) + TV(:) + XFM(:));
 end

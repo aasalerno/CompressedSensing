@@ -18,7 +18,7 @@ res.TVWeight = 0.01;	% TV penalty
 res.xfmWeight = 0.01;   % transform l1 penalty
 
 res.Itnlim = 20;	% default number of iterations
-res.gradToll = 1e-30	% step size tollerance stopping criterea (not used)
+res.gradToll = 1e-30;	% step size tollerance stopping criterea (not used)
 
 res.l1Smooth = 1e-15;	% smoothing parameter of L1 norm
 res.pNorm = 1;  % type of norm to use (i.e. L1 L2 etc)
