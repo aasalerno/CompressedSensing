@@ -47,8 +47,8 @@ end
 %DN = [256,256]; 	% data Size
 % N = [128 128];
 % DN = [128 128];
-pctg = 0.05;  	% undersampling factor
-P = 9;			% Variable density polymonial degree
+pctg = 0.25;  	% undersampling factor
+P = 5;			% Variable density polymonial degree
 % TVWeight = 0.01; 	% Weight for TV penalty
 % xfmWeight = 0.1;	% Weight for Transform L1 penalty
 Itnlim = 8;		% Number of iterations
@@ -106,9 +106,9 @@ for n=1:8
 %     figure(3)
 %     subplot(2,4,n)
 %     imshow(abs(im_res),[])
-    abs(mean(im_res(:)))
-    abs(mean(im(:)))
-    pause(1)
+%     abs(mean(im_res(:)))
+%     abs(mean(im(:)))
+%     pause(1)
 end
 toc
 
@@ -139,7 +139,7 @@ toc
 
 
 diffRMS = rms(im(:)-im_res(:));
-
+% 
 % A = fft2(im);
 % B = fft2(im_res);
 % 
