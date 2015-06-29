@@ -1,4 +1,4 @@
-function [im_res,diffRMS] = demo_TVxfm(TVWeight,xfmWeight)
+function [im_res,diffRMS] = demo_TVxfm(TVWeight,xfmWeight,normmean)
 rand('twister',2000);
 addpath(strcat(pwd,'/utils'));
 
@@ -6,9 +6,14 @@ addpath(strcat(pwd,'/utils'));
 % This one is for reality checking
 % load brain.6.01-zpad.mat
 load brain.6.1-zpad-ksp.mat
-%im = im/max(im(:));
-figure(1)
-imshow(abs(im),[])
+if nargin<3 || normmean == 0
+    im = im/abs(max(im(:)));
+else
+    im = im/abs(mean(im(:)));
+end
+%im = phantom(256) + 0.01*(1i*randn(256) + randn(256));
+% figure(1)
+% imshow(abs(im),[])
 N = size(im);
 if length(N) == 2
     N = [N 1];
@@ -42,8 +47,8 @@ end
 %DN = [256,256]; 	% data Size
 % N = [128 128];
 % DN = [128 128];
-pctg = 0.25;  	% undersampling factor
-P = 5;			% Variable density polymonial degree
+pctg = 0.05;  	% undersampling factor
+P = 9;			% Variable density polymonial degree
 % TVWeight = 0.01; 	% Weight for TV penalty
 % xfmWeight = 0.1;	% Weight for Transform L1 penalty
 Itnlim = 8;		% Number of iterations
@@ -89,14 +94,21 @@ if param.dirWeight
     [param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma); % AS
 end
 
+% im_res = XFM'*res(:,:,1);
 tic
 for n=1:8
+%     figure(3)
+%     subplot(3,3,n)
+%     imshow(abs(im_res),[])
     res = fnlCg(res,param);
 	im_res = XFM'*res(:,:,1);
 % 	%figure(100), imshow(abs(im_res),[]), drawnow
-    figure(3)
-    subplot(2,4,n)
-    imshow(abs(im_res),[])
+%     figure(3)
+%     subplot(2,4,n)
+%     imshow(abs(im_res),[])
+    abs(mean(im_res(:)))
+    abs(mean(im(:)))
+    pause(1)
 end
 toc
 
@@ -128,7 +140,23 @@ toc
 
 diffRMS = rms(im(:)-im_res(:));
 
-% w = whos;
-% for a = 1:length(w)
-% outs.(w(a).name) = eval(w(a).name);
-% end
+% A = fft2(im);
+% B = fft2(im_res);
+% 
+% abs(A(1))
+% abs(B(1))
+
+% % w = whos;
+% % for a = 1:length(w)
+% % outs.(w(a).name) = eval(w(a).name);
+% % end
+% figure
+% subplot(121)
+% imshow(abs(im_dc),[])
+% subplot(122)
+% imshow(abs(im_res),[])
+% 
+% abs(mean(im_dc(:)))
+% abs(mean(im_res(:)))
+
+
