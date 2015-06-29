@@ -6,7 +6,8 @@ addpath(strcat(pwd,'/utils'));
 
 % This one is for reality checking
 % load brain.6.01-zpad.mat
-load brain.6-zpad-ksp.mat
+% load brain.6-zpad-ksp.mat
+im = phantom(256) + 0.01*(1i*randn(256) + randn(256));
 
 
 
@@ -98,7 +99,7 @@ end
 tic
 for n=1:8
     res = fnlCg(res,param);
-	im_res = XFM'*res(:,:,1);
+	%im_res = XFM'*res;
 % 	%figure(100), imshow(abs(im_res),[]), drawnow
 %     figure(3)
 %     subplot(2,4,n)
@@ -106,6 +107,9 @@ for n=1:8
 end
 toc
 
+for i=N(3):-1:1
+    im_res(:,:,i) = XFM'*res(:,:,i);
+end
 % % create a low-res mask
 % mask_lr = genLRSampling_pctg(DN,pctg,1,0);
 % im_lr = ifft2c(zpad(fft2c(im).*mask_lr,N(1),N(2)));
