@@ -47,7 +47,7 @@ end
 %DN = [256,256]; 	% data Size
 % N = [128 128];
 % DN = [128 128];
-pctg = 0.25;  	% undersampling factor
+pctg = 0.10;  	% undersampling factor
 P = 5;			% Variable density polymonial degree
 % TVWeight = 0.01; 	% Weight for TV penalty
 % xfmWeight = 0.1;	% Weight for Transform L1 penalty
@@ -58,7 +58,7 @@ pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
 k = genSampling(pdf,10,60);		% generates a sampling pattern
 
 %generate transform operator
-XFM = Wavelet('Daubechies',6,4);	% Wavelet
+XFM = Wavelet('Daubechies',20,20);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
 

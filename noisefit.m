@@ -1,7 +1,7 @@
 function [fits,h] = noisefit(data)
 % tests if the data fits specific tests. It looks at Lorentzian, gaussian, rayleigh
 
-plotit = 1;
+plotit = 0;
 if numel(size(data)) ~= 2
     error('This isn''t an image of noise')
 end
