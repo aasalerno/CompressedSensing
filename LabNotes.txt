@@ -1,0 +1,287 @@
+01/06/15
+YESTERDAY
+Yesterday, I was able to run the vrecon (specifically vrecon_w) code on the lab computers for a dataset of Jacob's. The dataset that I ran can be found in: /projects/souris/jacob/fid/29jul14.fid
+
+I ran vrecon to get the datafiles split with respect to brain and gradient direction - this should make the analysis a bit easier. The notion is that we can easily play with these datasets to our heart's content, and then simply run them through an FFT algorithm to obtain the images that we are looking for. In addition, MATLAB should be able to write the ``data-altered" files to a very similar minc file, making the output similar to what we use in the lab. 
+
+
+TODAY
+As per Jacob, I may have made a decent mistake. The notion is that we should actually run the vrecon using the tag -rawfloat as this can help us out later. Jacob has some code already written that can handle the data in this way, so it may be beneficial to do it this way.
+
+12:55PM - Monitor and Disown
+I am monitoring the progress of the redo of vrecon, as I made yet another mistake. Once this is completed, I will begin with the proper vrecon. Since I am running this over PuTTY, I need to disown the jobs in order to be assured that they complete. The way I plan on doing this is by appending "&" to the end, then "jobs", then "disown", then "jobs" as a check. Information can be found here (http://serverfault.com/questions/311593/keeping-a-linux-process-running-after-i-logout)
+
+1:55PM - RAW test and MINC searching
+It finished. I'm looking at a .raw file now in MATLAB. First, I'm checking if MATLAB can even open the file. If it can't, we're in a bit of hot water. The important data is deemingly extremely difficult to locate in the minc structures, however, if I can do that, this may be a better way to go. Upon looking at Jacob's code, he seems to just pt it through a second recon that ends up converting the data into minc.
+Matlab seems to want to crash when using uiopen to open the .RAW files, and thus, fopen may be a better option. 
+
+2:50PM - Update for MINC searching - SUCCESS!
+MNC files can be readily read into MATLAB as long as you know what you're looking for and where it is.
+By using H5INFO in accordance with H5READ, I was able to find exactly what I was looking for -- the data. The data is buried in the file. If we assume that `info' is a variable that has all of the information of the file that we need, at location `filename', then in MATLAB, it looks like:
+info = h5info(filename); % We use this in order to look for the different pieces of the information that we need. In a 			   perfectly replicatable system, this only needs to be done once
+data  = h5read(filename,'/minc-2.0/image/0/image') %'/minc-2.0/image/0/image' is where the image data is seemingly held
+
+3:00PM - Beginning to write a function to handle the zero-filling
+The notion of what the function will do is in the function information (i.e. comments right under the name.) In addition, this will be done on GitHub in order to have version control!
+The first copy of this code is going to be a brute force method to write it, which can be cleaned up later on. As a side note, I am currently unsure as to whether or not the gradient information is held within the minc file. If it is, the code can be made much more robust, as it won't rely on an external txt file that I wrote with all of the gradient values written (in their 3 decimal point approximation - given to me by Jacob, from a paper). 
+
+10:33PM
+Having some troubles with the code, some unusual errors are popping up, but I'm trying to solve them as I go along. One of them came from meshgrid, and how it handles certain things, that was fixed relatively easily though. My most recent error is this "Error using  .* Integers can only be combined with integers of the same class, or scalar doubles." So, it looks like I'll need to figure out either the class of the data that I'm working with, or just have it go to a scalar double. 
+
+11:46PM 
+The only thing left to do would be to possibly make this code functional, and thus allow it to run over an extended period of time on the computers at work. The only issue that could arise with this is the fact that they do not have MATLAB installed on them. A possible fix would be to bring my hard drive and run everything through that - though I hope formatting it won't be necessary. The size of the data files may be a problem for a USB.
+
+
+01/07/15
+Meeting with Brian
+---------------------
+- Ask Jacob about the dimensionality of how he does his scans - make sure that we are doing the analysis using the gradient vector correctly
+- For this first experiment, given the readout gradient, we can use a circle to match the size of the strip for the other readout directions
+- Make sure that it can read back the data that we have written out using H5READ
+- Want to compare the unfiltered data from MATLAB and the filtered data to see differences, as well as what the full dataset from MATLAB looks like in comparison to vrecon. Here, we are trying to make sure that we don't have any differences from how the data is stored in the mnc file!
+
+- We need a comparison of other no CS undersampling techniques. Parallel to GD, lo-res and perpendicular
+
+
+01/08/15
+Post Meeting Analysis - Answering the notes from 01/07/15
+-------------------------------------------------------------
+- Ask Jacob about the dimensionality of how he does his scans - make sure that we are doing the analysis using the gradient vector:
+	- Jacob said that it is set up such that Gx is Phase Encode (PE), Gy is ReadOut (RO), and Gz is SLice (SL)
+	- The question now is, what does this mean with respect to the code? 
+- For this first experiment, given the readout gradient, we can use a circle to match the size of the strip for the other readout directions
+	- This will be added to the MATLAB code, see GitHub for details (https://github.com/aasalerno/CompressedSensing)
+- Make sure that it can read back the data that we have written out using H5READ
+	- Testing this as of 1:09PM 
+	- How it is done:
+		- Read in a dataset
+		- Copy a file with *different data* to a different location
+		- Save the data from the first file to the data location of the second file
+		- Read in the data from the second file
+		- Compare it to the data from the first file - it should be identical
+`	- The code that was used is as follows:
+                b = h5read('C:\Users\saler_000\Documents\raw\real\RealImgRaw.2.1.mnc','/minc-2.0/image/0/image');
+                copyfile('C:\Users\saler_000\Documents\raw\real\RealImgRaw.2.2.mnc','test.mnc');
+                h5write('test.mnc','/minc-2.0/image/0/image',b);
+                b1 = h5read('test.mnc','/minc-2.0/image/0/image');
+                b1 == b;
+                a = ans;
+                test1 = prod(size(a)); % Tells us the size of a (i.e. how many 1's we should have)
+                test2 = sum(a(:));
+		test1 == test2 % If this gives 1, we're good!
+	- Using this, we get the value that we expect.		 
+- Want to compare the unfiltered data from MATLAB and the filtered data to see the differences that exist, as well as what the full dataset from MATLAB looks like in comparison to vrecon. Here, we are trying to make sure that we don't have any differences from how the data is stored in the mnc file!
+	- One thing to note is what Matthijs said about how the data is cast by the visualization tools... May need to ensure that we do the FFT in the same datatype as it would be done in vrecon (i.e. is this before or after conversion? And if before, how will we change back to the old dataset?)
+- We need a comparison of other no CS undersampling techniques. Parallel to GD, lo-res and perpendicular
+	- Will change the way that the filter is done, see GitHub for details (https://github.com/aasalerno/CompressedSensing)
+	- Likely will do it in such a way that we can effortlessly change the filter between different scans for the greatest simplicity
+
+2:00PM - Error with input of data
+Found a relatively big issue with respect to how MATLAB is reading in the data. Although the data dimensions are z,x,y for RealImgRaw._._.mnc, with the dimensions of z (180), x (180), y(324), the dataset has dimensions of 324x180x180.
+	- This could be either y,x,z or y,z,x
+	- In order to test this, Matthijs suggested to do a mincreshape and look at where the data is held. I changed the size of z to 200, and noticed the final answer had dimensions of 324x180x200, meaning that the dimensions are y,x,z. This seems to be an inversion (for no reason) on MATLAB's part.
+	- What is the best way to handle this?! We don't want to have any errors... A possible idea would be to apply a mincreshape if there are data that have the same dimensions
+		- So, apparently the information can be found! h5readatt(filename,'minc-2.0/info/vnmr','array')
+		- If we know what the order is (which we do, thanks to Jacob), we can give attributes to each of the dimensions (i.e. possibly a file saying what everything is that can be made for each type or something of the sort
+
+
+01/09/15
+9:43AM - Filter Function Alteration
+At YorkU - working on Laptop (will be noted from now on)
+Meeting with Brian said that we need to have different filters to compare... As it stands right now, we only have one option, but the others are to be coded in right now.
+The options will be:
+	- 'par' - parallel to the gradient direction
+	- 'per' - perpendicular to the gradient direction
+	- 'lores' - square in the center for low resolution
+*Possibility to add 'circ' for a circle in the centre*
+	- In order to get the same factor, assuming we have a circle, instead of going out to sqrt(sampFac) on either side (making the undersampled area sampFac of the original), the circle needs to go to a radius of sqrt(sampFac/pi)
+- The expectation is that perpendicular will be best, 'lores' would be second best and parallel would be the worst in terms of reconstruction.
+Changed the name of testline.m to linefilt.m and added some functionality based on infinities vs. NaN's.
+
+3:08PM - Codes written
+Codes run error free but that doesn't mean that they are necessarily correct.
+Something that we need to keep in mind is how the casting is done in vrecon etc so that we don't have any differences. An error that I'm scared of getting is from how we map the values to uint16, as it may be too simple. It may be better to do it as a mapminmax where we specify the min and max to be the values obtainable using uint16. An (unfortunately) plausible error that could occur could be based on inconsistencies between the two datasets, as we won't necessarily have the same minimum as the original dataset in the final dataset. 
+
+
+01/12/15
+The plans for today include writing codes to:
+- Read in a minc file (doable from code already written) [mincread.m]
+	- Allows for one to read in the image, max or min values
+- Map a minc file depending on the max and min values contained in them
+	- Written as of 2:45PM [mincmap.m]
+	- Speeds seem very fast as of right now
+	- Need to add functionality to not ONLY work with files but also with datasets, provided that we have the max and min already
+	- Logical to make a different code to do the reverse, as the only information we need is slice dimension, which can be input as a number, or if it's a string, we will look in the specified filename
+	- Written [mincmap16.m]
+- Write a minc file, data and max/min values
+	- The aforementioned code would be good to have for this case, with a quick case switch depending on if the data is in uint16 or double, as h5 needs the data in uint16
+		- WORKING (decent). According to MATLAB, if I load one from the file and apply the forward and reverse transforms to another, MATLAB says they're different, but it also says that the difference between the two is zero for all values.
+	- Written and seemingly works! [mincwrite.m]
+- Do a 1D & 3D FFT on mapped minc data
+	- The problem I have with this is how exactly do I plan to *store*the data after to be looked at... This doesn't make sense to me, unfortunately...
+	- In process of writing a code to do both, but noticed some functionality errors with mincmap.m, need to fix those first.
+	- Written, and seems to work well (didn't look at the FFT data however)
+
+8:18PM
+Should make a file that can do a full recon based off of the data that we currently have. It should:
+	- Take in the data, both real and imaginary
+	- Perform a 3D FFT on the summative dataset
+	- Take the magnitude of the FFT
+	- Write the magnitude information to file
+	- Write the min and max information to file
+This function can then be put into a script to be done recursively over all datasets.
+
+THERE IS A MAJOR ERROR IN MINCMAP and thus it isn't working properly. The zero, as noted earlier, may have just been a fluke.
+	- The error came from how dataset was handling the multiplication. uint16*double = uint16
+	- Second error found, where mincmap was dividing by 2^16 instead of 2^16-1 (same with mincmap16)
+
+MORE ISSUES!
+Need to be able to find out how much each file was rotated (if it was) in the data - if it wasn't we're in the clear as this may be before registration.
+
+
+01/15/15
+In Lab
+Note that Brian said something about the "array" variable being untrustworthy, and thus we may have to find some other way to figure out data orientation if we want this to be used in the future.
+Computers are now able to run MATLAB (for the next 17 days, apparently), so I will try to run some of the codes from here
+	- Something I may try to do is to run a system check for which codes to run, otherwise, I'll have to hard code it in...
+	- Use function "ispc" or "isunix" - albeit kludgey, it will give the answers that we need for right now.
+
+11:54AM
+Going to start building the filter recon code as I can have it run on these computers overnight!
+It will use "undersamp.m" as a basis or use undersamp, but we need to change a few things
+	- It will be used in another script that will effectively create the different path names as we require them
+	- We want to FFT them before we write them to file
+		- In order to do this, we should make sure to also read in the maxmin information for the data
+
+		
+01/28/15
+9:58AM
+FA and MD Maps
+Yesterday I had a meeting with Jacob, and he told me to do the following in order to get everything to work for the FA and MD maps.
+-----------------------------------------------------------------------------------------------
+DTI Recon and Analysis Steps:
+
+export FIDDIR="."
+export IMGDIR="."
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/projects/mice/share/arch/linux-x86_64-glibc2_3/matlab2010b/runtime/glnxa64:/projects/mice/share/arch/linux-x86_64-glibc2_3/matlab2010b/bin/glnxa64:/projects/mice/jbishop/bin;
+
+Edit procpar: Change npetables from 25 to 1
+
+/projects/mice/jbishop/bin/vrecon_w -vmap /projects/mice/jacob/fid/table_test/JE_Table_Angdist_nf60_ni17 -noclip -shiftppe2 fid DW_Recon
+
+After Recon in the Directory where all the files were put.
+
+for i in `seq 1 16`; do for j in `seq 1 9`; do mv DW_Recon.${i}.${j}.mnc DW_Recon.${i}.0${j}.mnc; done; done; for i in `seq 1 16`; do mincconcat -concat_dimension time DW_Recon.${i}.*.mnc DW_Recon.${i}.mnc -clobber; done; for i in `seq 1 16`; do echo DW_Recon.${i}.mnc; mincreshape -2 -quiet -clobber -dimrange time=1,30 DW_Recon.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} DW_Recon.${i}_highb.mnc; rm tmp_${i}; mincreshape -2 -quiet -clobber -dimrange time=31,35 DW_Recon.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} DW_Recon.${i}_b0.mnc; rm tmp_${i}; done;
+
+After that has been accomplished the rest of the analysis follows.
+
+But what you need to start from is the 4D image files (DW_Recon.${i}.mnc or 4D_IMAGE_NAMES.mnc) from the reconstructed data set.  This will be located in the fid directory the day of your scan in the /projects/mice/jacob/fid/ directory. If you are unsure which is the 4D file do a mincinfo and it will look like:
+
+image: unsigned short 0 to 65535
+image dimensions: time zspace xspace yspace
+    dimension name         length         step        start
+    --------------         ------         ----        -----
+    time                       35            1            0
+    zspace                    180     0.077778      42.0389
+    xspace                    180    -0.077778      28.9611
+    yspace                    324     -0.07716      12.4614
+
+Then that image needs to be converted to nifty format, which is easy thanks to Jan.  
+>  for i in `seq 1 16`; do base=`basename DW_Recon.${i}.mnc .mnc`; miceconvert DW_Recon.${i}.mnc ${base}_FSL; done;
+
+That will run for a bit and then you have a bunch of files named 4D_IMAGE_NAMES.nii.gz.  Then you need to create a mask file for those images. You do this with the following command
+
+> for file in *_FSL.nii.gz; do base=`basename $file .nii.gz`; fslmaths $file -Tmean -mul 0 -add 1 ${base}_mask; done;
+
+That will run for a bit and it will create a new file for each of your 4D_IMAGE_NAMES that has _mask.nii.gz at the end.  The you want to copy the following files over to your directory "bvals" and "bvecs" which are located in "/projects/mice/jacob/fid/02jun13.fid/FSL/".  Once you have those files you are ready to create your DTI images using "dtifit"
+
+> for file in 4D_IMAGE_NAMES_FSL.nii.gz; do base=`basename $file .nii.gz`; dtifit -k ${base} -o ${base}_DTI -m ${base}_mask -r bvecs -b bvals; done;
+
+That will create a multitude of files for each 4D image.  They will all have two letter designations for which is which (i.e. FA, MD, L1, L2 etc.).  I convert them back to mmc files at this point for the analysis.  I usually just convert the MD, FA, L1, L2 and L3.
+
+> for file in 4D_IMAGE_NAMES_FSL.nii.gz; do base=`basename $file .nii.gz`;  for i in MD FA L1 L2 L3; do ~jscholz/bin/micescripts/miceconvert ${base}_DTI_${i}.nii.gz ${base}_DTI_${i}_new.nii.gz; done; done;
+
+ON the FARMS:
+> for file in 4D_IMAGE_NAMES_FSL.nii.gz; do base=`basename $file .nii.gz`;  for i in MD FA L1 L2 L3; do sge_batch ~jscholz/bin/micescripts/miceconvert ${base}_DTI_${i}.nii.gz ${base}_DTI_${i}_new.nii.gz; done; done;
+
+Now you should have all the MD, FA and 3 Eigenvalues images in mmc format.  Then you need to distortion correct each of them. Since the coil number doesn't make it through all of this work you will need to specify the coil number for each file with a ":1" or ":2" behind the file name.  You should be able to create a loop for this.
+-----------------------------------------------------------------------------------------------
+One thing that he noted was that Jan stated that the gradient vectors should have the y-value negated in order to get the correct eigenvectors and eigenvalues, which seems weird to me. So, I'm rerunning the codes in both styles, with the old gradient vector, and with the new gradient vector
+  - Due to an error in processing the codes, the data will have the form that "_new" will be the new stuff using the negative y-values, and the normal stuff will be those with the original y-values
+  - I had to rerun the code because of the same error as mentioned earlier
+  
+02/09/15
+Doing the recons is finally done and I've made some FA and MD maps and all that jazz.
+
+Some code to do all of that stuff can be found right here:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sty="par";
+nb=8;
+
+for i in `seq 1 ${nb}`; do for j in `seq 1 9`; do mv Recon_${sty}.${i}.${j}.mnc Recon_${sty}.${i}.0${j}.mnc; done; done; for i in `seq 1 ${nb}`; do mincconcat -concat_dimension time Recon_${sty}.${i}.*.mnc Recon_${sty}.${i}.mnc -clobber; done; for i in `seq 1 ${nb}`; do echo Recon_${sty}.${i}.mnc; mincreshape -2 -quiet -clobber -dimrange time=1,30 Recon_${sty}.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} Recon_${sty}.${i}_highb.mnc; rm tmp_${i}; mincreshape -2 -quiet -clobber -dimrange time=31,35 Recon_${sty}.${i}.mnc tmp_${i}; mincaverage -2 -quiet -clobber -avgdim time tmp_${i} Recon_${sty}.${i}_b0.mnc; rm tmp_${i}; done;
+
+for i in `seq 1 ${nb}`; do base=`basename Recon_${sty}.${i}.mnc .mnc`; miceconvert Recon_${sty}.${i}.mnc ${base}_FSL; done; 
+
+for i in `seq 1 ${nb}`; do t=$(expr $i - 1); fileArray[${t}]="Recon_"${sty}"."${i}"_FSL.nii.gz"; done;
+
+for file in ${fileArray[*]}; do base=`basename $file .nii.gz`; fslmaths $file -Tmean -mul 0 -add 1 ${base}_mask; done;
+
+for i in `seq 1 ${nb}`; do for file in Recon_${sty}.${i}_FSL.nii.gz; do base=`basename $file .nii.gz`; dtifit -k ${base} -o ${base}_DTI -m ${base}_mask -r bvecs -b bvals; done; done;
+
+for j in `seq 1 ${nb}`; do for file in Recon_${sty}.${j}_FSL.nii.gz; do base=`basename $file .nii.gz`;  for i in MD FA L1 L2 L3; do ~jscholz/bin/micescripts/miceconvert ${base}_DTI_${i}.nii.gz ${base}_DTI_${i}.nii.gz; done; done; done;
+
+
+if test ! -d "$Distortion_Correction"; then mkdir "$Distortion_Correction"; fi
+
+for i in `seq 1 ${nb}`; do for j in MD FA L1 L2 L3; do /micehome/matthijs/32-bit/bin/distortion_correction_september_2014.pl Distortion_Correction/ Recon_${sty}.${i}_FSL_DTI_${j}.nii.gz.mnc:${i}; done; done;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+- I noted that brain 4 is terrible. I don't think that there was actually a brain in there... Will talk to Jacob about that now. 
+
+Creating a mincrms function in order to test the RMS difference between my data and Jacob's.
+  - However, something fishy happens in my data, and for some unapparent reason, it gets skyrocketed to the order of 1e4.
+  - An idea for right now is to use a ratio system. We will use a comparative analysis between the maxima and minima
+    - However, a pretty major problem arises from this! If the system exists such that theres a net decrease in the level, then we wont be able to see this, as it will be normalized.
+  - The problem arises from how the data files are (i.e. the minc files before the FFT is done. I may need to get rid of the DC component... Possibly getting rid of the average?
+ 
+02.11.15
+MEETING WITH BRIAN:
+
+Want to talk about a few things:
+
+1) DEALING WITH JACOB'S DATA IN COMPARISON TO MY OWN
+a) Currently have a simple code that compares values from maps but there's a huge intensity difference between my data and Jacob's - how should I deal with this?
+	- Should be able to do just a straight visual comparison using the FA maps
+	- We want to see if we've just included some blur or what exactly is happening
+		- May run the data through the same pipeline without a mask to normalize properly
+	
+b) I actually have to make the maps for Jacob's data which I didn't realize, so I'm doing that now
+
+2) WORKING WITH LISA (GAZDZINSKI) ON THE OPT DATA SO THAT IT CAN BE DONE
+   She is currently being "forced" per sei to make maps in order for the registration not to fail. Since I know you wanted this done (by me to begin with), I figured it was something that I could help with while code was running or something like that
+
+3) PHASE CORRECTION
+a) Firstly did we get the data? And can I see the code?
+	- Jacob did send the data :)
+	- Brian wrote most of the code
+
+b) When we're implementing the code, how will we know whether or not it can be applied retroactively? On that note, how exactly is it applied?
+	- May want to implement the corrections that Leigh is doing for the phase encode
+
+4) WHERE TO GO FROM HERE
+a) I think at this point it may be a good idea to focus a bit on number two - we should do some proof of principle stuff for the CS work
+
+b) Also, I think it may be a good idea to try to implement the paper that I'm doing for JC if we collectively think it's a good idea
+
+5) SEMINAR
+   I know we talked about this a bit last week but I would feel better if we could go over this again next week so I can solidify exactly what I plan on presenting and then have it ready for the Wednesday before my seminar, giving me a week to fix it.
+  - Didn't end up discussing this
+
+  
+02.12.15
+Looking over Brian's Phase Correction Code - 11:30AM
+So, I can't seem to run it as I don't have the required modules apparently... I'm going to email Leigh about this and see if she can give me some sort of direction with respect to this because I don't want to spend an inordinate amount of time on it. From here, I think I'm going to work on some of the CS stuff. 
+
+
