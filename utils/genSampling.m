@@ -31,7 +31,7 @@ for n=1:iter
 		tmp = rand(size(pdf))<pdf;
 	end
 	
-	TMP = ifft2(tmp./pdf);
+	TMP = ifft2(tmp./(pdf+eps)); % added eps for the sake of not dividing by zero
 	if max(abs(TMP(2:end))) < minIntr
 		minIntr = max(abs(TMP(2:end)));
 		minIntrVec = tmp;

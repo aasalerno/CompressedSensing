@@ -36,7 +36,7 @@ XFM = Wavelet('Daubechies',4,4);	% Wavelet
 
 % initialize Parameters for reconstruction
 param = init;
-param.FT = FT;
+param.FT{1} = FT;
 param.XFM = XFM;
 param.TV = TVOP;
 param.data = data;

@@ -47,18 +47,19 @@ end
 %DN = [256,256]; 	% data Size
 % N = [128 128];
 % DN = [128 128];
-pctg = 0.10;  	% undersampling factor
+pctg = 0.1;  	% undersampling factor
 P = 5;			% Variable density polymonial degree
 % TVWeight = 0.01; 	% Weight for TV penalty
 % xfmWeight = 0.1;	% Weight for Transform L1 penalty
 Itnlim = 8;		% Number of iterations
 
 % generate variable density random sampling
-pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
+%pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
+pdf = genPDFann([180 180],P,0.25,0.95,1,[256 256],2,0.20,0);
 k = genSampling(pdf,10,60);		% generates a sampling pattern
 
 %generate transform operator
-XFM = Wavelet('Daubechies',20,20);	% Wavelet
+XFM = Wavelet('Daubechies',20,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
 
@@ -73,7 +74,7 @@ for kk=1:N(3)
     trans.FT{kk} = p2DFT(k, [N(1) N(2)], ph, 2);
     FT = trans.FT{kk};
     data(:,:,kk) = reshape(FT*squeeze(im(:,:,kk)),[N(1) N(2) 1]);
-    im_dc(:,:,kk) = reshape(FT'*(squeeze(data(:,:,kk))./pdf),[N(1) N(2) 1]);
+    im_dc(:,:,kk) = reshape(FT'*(squeeze(data(:,:,kk))./(pdf+eps)),[N(1) N(2) 1]);
     res(:,:,kk) = reshape(XFM*(squeeze(im_dc(:,:,kk))),[N(1) N(2) 1]);
 end
 % ---------------------------

@@ -6,8 +6,8 @@ addpath(strcat(pwd,'/utils'));
 
 % This one is for reality checking
 % load brain.6.01-zpad.mat
-% load brain.6-zpad-ksp.mat
-im = phantom(256) + 0.01*(1i*randn(256) + randn(256));
+load brain.6-zpad-ksp.mat
+% im = phantom(256) + 0.01*(1i*randn(256) + randn(256));
 
 
 
@@ -39,6 +39,11 @@ sigma = 2; % Standard deviation of the gaussian to control thickness (this is th
 dimcheck = load(filename);
 if (isempty(find(size(dimcheck) == N(3),1))) && dirWeight ~= 0
     error('The data does not comply with the number of directions')
+end
+
+param = init;
+if dirWeight
+    [param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma); % AS
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,7 +87,6 @@ end
 
 
 % initialize Parameters for reconstruction
-param = init;
 param.FT = trans.FT;
 param.XFM = XFM;
 param.TV = TVOP;
@@ -91,10 +95,6 @@ param.TVWeight =TVWeight;     % TV penalty
 param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
 param.Itnlim = Itnlim;
-
-if param.dirWeight
-    [param.dirPair, param.dirPairWeight] = dotThresh(filename,thresh,sigma); % AS
-end
 
 tic
 for n=1:8
