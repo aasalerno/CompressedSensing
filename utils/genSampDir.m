@@ -1,7 +1,4 @@
-function [pdf,val] = genPDFDir(imSize,p,pctg,wpdfs,cyl,distType,radius,disp)
-%
-%      NOT COMPLETED!!!!!!
-%
+function [pdf,val] = genSampDir(imSize,pctg,wpdfs,cyl,radius,disp)
 %[pdf,val] = genPDFann(imSize,p,pctg [,annRad,cyl,orImSz,distType,radius,disp])
 %
 %	generates a pdf for a 1d or 2d random sampling pattern

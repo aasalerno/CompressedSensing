@@ -1,3 +1,5 @@
+function vecsMin = vecSet()
+
 dirs = load('GradientVectorMag.txt');
 
 r = zeros(30);
@@ -22,7 +24,6 @@ counter = 0;
 maxcnt = 0;
 cnt = 0;
 for a = 1:24
-    a
     %cnt = 0;
     for b = a+1:25
         eng1 = 1./r(a,b);
