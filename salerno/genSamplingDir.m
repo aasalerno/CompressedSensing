@@ -1,10 +1,10 @@
-function samp = vecSubSet(imSize,pctg,cyl,nmins)
+function samp = genSamplingDir(imSize,pctg,cyl,radius,nmins,endSize,engfile)
 
 % -----------------------------------------------
 % Figure out how the vectors are going to work -- what combinations should
 % be used
 %
-if nargin < 4
+if nargin < 5
     nmins = 5;
 end
 
@@ -35,10 +35,15 @@ vecs = combnk(1:k,2);
 engStart = zeros(1,length(combs));
 
 % Figure out energies for said combos
-for i = 1:length(combs)
-    for j = 1:length(vecs)
-        engStart(i) = engStart(i) + invR(combs(i,vecs(j,1)),combs(i,vecs(j,2)));
+if nargin < 7 | ~exist(engfile,'file')
+    for i = 1:length(combs)
+        for j = 1:length(vecs)
+            engStart(i) = engStart(i) + invR(combs(i,vecs(j,1)),combs(i,vecs(j,2)));
+        end
     end
+    save(['eng-' num2str(n) 'dirs-' num2str(nmins) 'mins.mat'],'engStart');
+else
+    load(engfile);
 end
 
 % Ensure that we don't have major differences in how many counts for each
@@ -132,4 +137,12 @@ end
 
 for i = 1:numel(rx)
     samp(rx(i),ry(i),:) = 1;
+end
+
+if nargin < 6 | endSize ~= imSize
+    samp_final = zeros([endSize,n]);
+    for i = 1:n
+        samp_final(:,:,i) = zpad(samp(:,:,i),endSize(1),endSize(2));
+    end
+    samp = samp_final;
 end

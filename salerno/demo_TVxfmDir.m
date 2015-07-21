@@ -1,5 +1,4 @@
 function [im_res,diffRMS] = demo_TVxfmDir(TVWeight,xfmWeight,dirWeight)
-tic
 rand('twister',2000);
 addpath(strcat(pwd,'/utils'));
 
@@ -10,15 +9,13 @@ load brain.6-zpad-ksp.mat
 % im = phantom(256) + 0.01*(1i*randn(256) + randn(256));
 
 
-
 N = size(im);
 if length(N) == 2
     N = [N 1];
 end
-
-% for i = 1:N(3)
-%     im(:,:,i) = im(:,:,i)/max(max(im(:,:,i)));
-% end
+for i = 1:N(3)
+     im(:,:,i) = im(:,:,i)/max(max(im(:,:,i)));
+end
 
 DN = [N(1) N(2)];
 data = zeros(N);
@@ -61,23 +58,25 @@ P = 5;			% Variable density polymonial degree
 Itnlim = 8;		% Number of iterations
 
 % generate variable density random sampling
-pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
-k = genSampling(pdf,10,60);		% generates a sampling pattern
+% pdf = genPDF(DN,P,pctg , 2 ,0.1,0);	% generates the sampling PDF
+% k = genSampling(pdf,10,60);		% generates a sampling pattern
+load('sampPattern.mat');
+k = samp;
 
 %generate transform operator
-XFM = Wavelet('Daubechies',6,4);	% Wavelet
+XFM = Wavelet('Daubechies',20,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
 
 %  ------------- END
-
+pdf = (sum(k,3) + eps)/max(k(:));
 
 % AS
 for kk=1:N(3)
     % calculate the phase:
     ph = phCalc(squeeze(im(:,:,kk)),0,0);
     % FT
-    trans.FT{kk} = p2DFT(k, [N(1) N(2)], ph, 2);
+    trans.FT{kk} = p2DFT(k(:,:,kk), [N(1) N(2)], ph, 2);
     FT = trans.FT{kk};
     data(:,:,kk) = reshape(FT*squeeze(im(:,:,kk)),[N(1) N(2) 1]);
     im_dc(:,:,kk) = reshape(FT'*(squeeze(data(:,:,kk))./pdf),[N(1) N(2) 1]);
@@ -104,8 +103,9 @@ for n=1:8
 %     figure(3)
 %     subplot(2,4,n)
 %     imshow(abs(im_res),[])
+    toc
 end
-toc
+
 
 for i=N(3):-1:1
     im_res(:,:,i) = XFM'*res(:,:,i);
@@ -141,4 +141,5 @@ diffRMS = rms(im(:)-im_res(:));
 % for a = 1:length(w)
 % outs.(w(a).name) = eval(w(a).name);
 % end
+save(['/projects/muisjes/asalerno/CS/data/directionalData/xfm_0.01.TV_0.01.dir_' num2str(dirWeight) '.mat'],'im_res')
 toc

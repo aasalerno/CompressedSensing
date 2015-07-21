@@ -1,4 +1,4 @@
-function [locs,vals] = dotThresh(filename,thresh)
+function [locs,vals] = dotThresh(filename,thresh,sigma)
 
 if isempty(filename); 
     v1 = load('C:\Users\saler_000\Dropbox\GradientVector.txt'); 
@@ -19,7 +19,7 @@ for i=1:nv-1
         if dp >= thresh
             cnt = cnt + 1;
             locs(cnt,:) = int8([i j]);
-            vals(cnt) = dp;
+            vals(cnt) = exp(-((dp-1).^2)/(2*sigma^2));
         end
     end
 end

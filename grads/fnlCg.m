@@ -41,7 +41,6 @@ dx = -g0;
 % iterations
 
 while(1)
-tic    
     % backtracking line-search
     
     % pre-calculate values, such that it would be cheap to compute the objective
@@ -57,6 +56,9 @@ tic
         lsiter = lsiter + 1;
         t = t * beta;
         [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,XFMtx, XFMtdx,x,dx, t, params);
+        if abs(f1/f0 - 1) < 1e-2
+            break;
+        end
     end
     
     if lsiter == maxlsiter

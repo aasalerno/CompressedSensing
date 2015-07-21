@@ -12,12 +12,12 @@ if isksp
 end
 
 if rl
-    disp('Lustig''s way')
+    %disp('Lustig''s way')
     phmask = zpad(hamming(6)*hamming(6)',N(1),N(2)); %mask to grab center frequency
     phmask = phmask/max(phmask(:));
     ph = exp(1i*angle((ifft2c(data.*phmask))));
 else
-    disp('Brian''s Way')
+    %disp('Brian''s Way')
     F = fspecial('gaussian',[5 5],2);
     filtdata = imfilter(data,F,'same');
 %    imshow(filtdata);
