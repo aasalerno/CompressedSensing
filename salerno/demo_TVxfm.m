@@ -1,12 +1,12 @@
-function [im_res,diffRMS] = demo_TVxfm(TVWeight,xfmWeight,normmean)
+function [im_res,diffRMS] = demo_TVxfm(vec,TVWeight,xfmWeight,normmean)
 rand('twister',2000);
 addpath(strcat(pwd,'/utils'));
 
 
 % This one is for reality checking
 % load brain.6.01-zpad.mat
-load brain.6.1-zpad-ksp.mat
-if nargin<3 || normmean == 0
+load(['brain.6.' num2str(vec) '-zpad-ksp.mat'])
+if nargin<4 || normmean == 0
     im = im/abs(max(im(:)));
 else
     im = im/abs(mean(im(:)));
