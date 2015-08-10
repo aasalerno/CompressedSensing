@@ -15,8 +15,8 @@ DN = [256,256]; 	% data Size
 % DN = [128 128];
 pctg = [0.25];  	% undersampling factor
 P = 5;			% Variable density polymonial degree
-TVWeight = 0.5; 	% Weight for TV penalty
-xfmWeight = 0.5;	% Weight for Transform L1 penalty
+TVWeight = 0.01; 	% Weight for TV penalty
+xfmWeight = 0.01;	% Weight for Transform L1 penalty
 Itnlim = 8;		% Number of iterations
 
 
@@ -26,7 +26,7 @@ k = genSampling(pdf,10,60);		% generates a sampling pattern
 
 %generate image
 %im = (phantom(N(1)))  + randn(N)*0.01 + i*randn(N)*0.01;
-load brain.6.01-zpad-ksp.mat
+load brain.6.1-zpad-ksp.mat
 
 %generate Fourier sampling operator
 ph = phCalc(im,0,0);
