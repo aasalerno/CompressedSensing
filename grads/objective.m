@@ -83,7 +83,7 @@ if isfield(params,'dirWeight') && params.dirWeight~=0
         RMS = sqrt(obj/sum(abs(params.data(:))>0));
         
         
-        res = sum(obj(:) + TV(:) + XFM(:) + dirDiff(:));
+        res = sum(obj(:) + TV(:) + XFM(:) + dirDiff(:)/n);
 %         fprintf('Objective: %1.3e \n',(sum(obj(:))))
 %         fprintf('XFM: %1.3e \n',(sum(XFM(:))))
 %         fprintf('TV: %1.3e \n',(sum(TV(:))))
