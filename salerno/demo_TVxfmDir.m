@@ -26,8 +26,8 @@ res = zeros(N);
 % Direction Recon Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 filename = '/micehome/asalerno/Documents/CompressedSensing/GradientVectorMag.txt'; % Vector file
-thresh = 0.9; % Minimum dot product we'll accept
-sigma = 2; % Standard deviation of the gaussian to control thickness (this is the weight)
+thresh = 0.6; % Minimum dot product we'll accept
+sigma = 0.1; % Standard deviation of the gaussian to control thickness (this is the weight)
 %dirWeight = 0;   % Weight for directionally similar penalty
 
 % Check to make sure that the number of directions is the same as number of
@@ -64,7 +64,7 @@ load('sampPattern.mat');
 k = samp;
 
 %generate transform operator
-XFM = Wavelet('Daubechies',20,4);	% Wavelet
+XFM = Wavelet('Daubechies',10,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
 %XFM = 1;				% Identity transform
 
@@ -98,14 +98,13 @@ param.Itnlim = Itnlim;
 tic
 for n=1:8
     res = fnlCg(res,param);
+    n
 	%im_res = XFM'*res;
 % 	%figure(100), imshow(abs(im_res),[]), drawnow
 %     figure(3)
 %     subplot(2,4,n)
 %     imshow(abs(im_res),[])
-    toc
 end
-
 
 for i=N(3):-1:1
     im_res(:,:,i) = XFM'*res(:,:,i);
@@ -141,5 +140,4 @@ diffRMS = rms(im(:)-im_res(:));
 % for a = 1:length(w)
 % outs.(w(a).name) = eval(w(a).name);
 % end
-save(['/projects/muisjes/asalerno/CS/data/directionalData/xfm_0.01.TV_0.01.dir_' num2str(dirWeight) '.mat'],'im_res')
-toc
+save(['/projects/muisjes/asalerno/CS/data/directionalData/thresh_' num2str(thresh) '/xfm_' num2str(xfmWeight) '.TV_' num2str(TVWeight) '.dir_' num2str(dirWeight) '.mat'],'im_res')
