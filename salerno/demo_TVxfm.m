@@ -5,7 +5,7 @@ addpath(strcat(pwd,'/utils'));
 
 % This one is for reality checking
 % load brain.6.01-zpad.mat
-load(['brain.6.' num2str(vec) '-zpad-ksp.mat'])
+load(['brain6.' num2str(vec) '-zpad-ksp.mat'])
 if nargin<4 || normmean == 0
     im = im/abs(max(im(:)));
 else

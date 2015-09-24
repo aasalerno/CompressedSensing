@@ -1,4 +1,4 @@
-function [im_res,diffRMS] = demo_TVxfmDir(TVWeight,xfmWeight,dirWeight)
+function [im_res,diffRMS] = demo_TVxfmDir(TVWeight,xfmWeight,dirWeight,thresh,sigma)
 rand('twister',2000);
 addpath(strcat(pwd,'/utils'));
 
@@ -7,6 +7,7 @@ addpath(strcat(pwd,'/utils'));
 % load brain.6.01-zpad.mat
 load brain.6-zpad-ksp.mat
 % im = phantom(256) + 0.01*(1i*randn(256) + randn(256));
+load ksp_startloc.mat
 
 
 N = size(im);
@@ -18,9 +19,9 @@ for i = 1:N(3)
 end
 
 DN = [N(1) N(2)];
-data = zeros(N);
-im_dc = zeros(N);
-res = zeros(N);
+% data = zeros(N);
+% im_dc = zeros(N);
+% res = zeros(N);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Direction Recon Parameters
@@ -62,7 +63,7 @@ Itnlim = 8;		% Number of iterations
 % k = genSampling(pdf,10,60);		% generates a sampling pattern
 load('sampPattern.mat');
 k = samp;
-
+data = data.*k;
 %generate transform operator
 XFM = Wavelet('Daubechies',10,4);	% Wavelet
 %XFM = TIDCT(8,4);			% DCT
@@ -71,22 +72,27 @@ XFM = Wavelet('Daubechies',10,4);	% Wavelet
 %  ------------- END
 pdf = (sum(k,3) + eps)/max(k(:));
 
+%Make the starting point what we got off the scanner
+% data = data.*k;
+
 % AS
 for kk=1:N(3)
     % calculate the phase:
-    ph = phCalc(squeeze(im(:,:,kk)),0,0);
-    % FT
-    trans.FT{kk} = p2DFT(k(:,:,kk), [N(1) N(2)], ph, 2);
-    FT = trans.FT{kk};
-    data(:,:,kk) = reshape(FT*squeeze(im(:,:,kk)),[N(1) N(2) 1]);
-    im_dc(:,:,kk) = reshape(FT'*(squeeze(data(:,:,kk))./pdf),[N(1) N(2) 1]);
+%     ph = phCalc(squeeze(im(:,:,kk)),0,0);
+%     % FT
+%     trans.FT{kk} = p2DFT(k(:,:,kk), [N(1) N(2)], ph, 2);
+%     FT = trans.FT{kk};
+    % data(:,:,kk) = reshape(FT*squeeze(im(:,:,kk)),[N(1) N(2) 1]);
+    im_dc(:,:,kk) = reshape(ifft2c(squeeze(data(:,:,kk))),[N(1) N(2) 1]);
     res(:,:,kk) = reshape(XFM*(squeeze(im_dc(:,:,kk))),[N(1) N(2) 1]);
 end
 % ---------------------------
 
+% % Then have the y term be our data that's added together.
+% load ksp_startloc.mat
 
 % initialize Parameters for reconstruction
-param.FT = trans.FT;
+%param.FT = trans.FT;
 param.XFM = XFM;
 param.TV = TVOP;
 param.data = data;
@@ -98,12 +104,12 @@ param.Itnlim = Itnlim;
 tic
 for n=1:8
     res = fnlCg(res,param);
-    n
-	%im_res = XFM'*res;
-% 	%figure(100), imshow(abs(im_res),[]), drawnow
+     n
+% 	im_hold = XFM'*res(:,:,1);
+% % 	%figure(100), imshow(abs(im_res),[]), drawnow
 %     figure(3)
 %     subplot(2,4,n)
-%     imshow(abs(im_res),[])
+%     imshow(abs(im_hold),[])
 end
 
 for i=N(3):-1:1
@@ -140,4 +146,21 @@ diffRMS = rms(im(:)-im_res(:));
 % for a = 1:length(w)
 % outs.(w(a).name) = eval(w(a).name);
 % end
-save(['/projects/muisjes/asalerno/CS/data/directionalData/thresh_' num2str(thresh) '/xfm_' num2str(xfmWeight) '.TV_' num2str(TVWeight) '.dir_' num2str(dirWeight) '.mat'],'im_res')
+% save(['/projects/muisjes/asalerno/CS/data/directionalData/thresh_' num2str(thresh) '/xfm_' num2str(xfmWeight) '.TV_' num2str(TVWeight) '.dir_' num2str(dirWeight) '.mat'],'im_res')
+
+% h = figure;
+% subplot(131)
+% imshow(im(:,:,1))
+% ph = phCalc(squeeze(im(:,:,1)),0,0);
+% imshow(im(:,:,1).*ph)
+% title('Fully Sampled')
+% 
+% subplot(132)
+% imshow(im_dc(:,:,1))
+% title('k-space Added')
+% 
+% subplot(133)
+% imshow(im_res(:,:,1))
+% title(['\lambda_1 = \lambda_2 = 0   \lambda_3 = ' num2str(dirWeight)])
+
+%mat2mnc(abs(im_res),['/home/asalerno/Desktop/08.11.15/add-ksp-data_dirWeight-' num2str(dirWeight) '_TVWeight-' num2str(TVWeight) '_xfmWeight-' num2str(xfmWeight) '.mnc'])
