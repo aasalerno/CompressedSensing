@@ -19,6 +19,11 @@ function x = fnlCg(x,params)
 % (c) Michael Lustig 2007
 %-------------------------------------------------------------------------
 
+persistent cntX
+
+if isempty(cntX)
+    cntX = 0;
+end
 
 % line search parameters
 maxlsiter = params.lineSearchItnlim ;
@@ -75,6 +80,9 @@ while(1)
         t0 = t0 / beta;
     end
     
+%     x1 = x(:,:,1);
+%     save(['/projects/muisjes/asalerno/CS/data/dirArtefactData/x_grad.' num2str(cntX) '.mat'],'x1');
+%     cntX = cntX +1;
     x = (x + t*dx);
     
     
@@ -99,7 +107,9 @@ while(1)
    %     disp(num2str(norm(dx(:))/numel(dx)));
    %     test = test+1;
     end
-    
+%     imshow(params.XFM'*x(:,:,1));
+%     pause(0.1)
+
 end
 
 
