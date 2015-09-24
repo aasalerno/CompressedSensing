@@ -1,3 +1,8 @@
+% The purpose of this function is to look at all of the data from the
+% different directions and do datasharing on them. The datasharing as it
+% currently stands is based on the closest 5 directions (including itself)
+% which relates to about 30 deg.
+
 dirs = load('GradientVectorMag.txt');
 load('sampPattern.mat')
 load('brain.6-zpad-ksp.mat')
