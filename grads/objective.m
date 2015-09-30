@@ -54,8 +54,8 @@ if isfield(params,'dirWeight') && params.dirWeight~=0
         Xi = XFMtx(:,:,dirPair(kk,1));
         DXi = XFMtdx(:,:,dirPair(kk,1));
         Xj = XFMtx(:,:,dirPair(kk,2));
-        %DXj = XFMtdx(:,:,dirPair(kk,2));
-        val = (Xi(:) + t*DXi(:) - Xj(:));
+        DXj = XFMtdx(:,:,dirPair(kk,2));
+        val = (Xi(:) + t*DXi(:) - Xj(:) - t*DXj(:));
         dir(kk) = wgt(kk).*(val'*val);
     end
     
