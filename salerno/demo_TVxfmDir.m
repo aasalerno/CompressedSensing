@@ -104,7 +104,7 @@ param.Itnlim = Itnlim;
 tic
 for n=1:8
     res = fnlCg(res,param);
-     n
+    n
 % 	im_hold = XFM'*res(:,:,1);
 % % 	%figure(100), imshow(abs(im_res),[]), drawnow
 %     figure(3)
