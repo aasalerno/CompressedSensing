@@ -165,4 +165,4 @@ diffRMS = rms(im(:)-im_res(:));
 % imshow(im_res(:,:,1))
 % title(['\lambda_1 = \lambda_2 = 0   \lambda_3 = ' num2str(dirWeight)])
 
-mat2mnc(abs(im_res),['/projects/muisjes/asalerno/CS/data/dirTermData/no-add-ksp_dirWeight-' num2str(dirWeight) '_thresh-' num2str(thresh) '_sigma-' num2str(sigma) '.mnc'])
+mat2mnc(abs(im_res),['/projects/egerek/asalerno/CS/data/dirTermData/no-add-ksp_dirWeight-' num2str(dirWeight) '_thresh-' num2str(thresh) '_sigma-' num2str(sigma) '.mnc'])
