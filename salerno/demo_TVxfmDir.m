@@ -7,7 +7,7 @@ addpath(strcat(pwd,'/utils'));
 % load brain.6.01-zpad.mat
 load brain.6-zpad-ksp.mat
 % im = phantom(256) + 0.01*(1i*randn(256) + randn(256));
-load ksp_startloc.mat
+load data_added_farthest.mat
 
 
 N = size(im);
@@ -163,4 +163,4 @@ diffRMS = rms(im(:)-im_res(:));
 % imshow(im_res(:,:,1))
 % title(['\lambda_1 = \lambda_2 = 0   \lambda_3 = ' num2str(dirWeight)])
 
-%mat2mnc(abs(im_res),['/home/asalerno/Desktop/08.11.15/add-ksp-data_dirWeight-' num2str(dirWeight) '_TVWeight-' num2str(TVWeight) '_xfmWeight-' num2str(xfmWeight) '.mnc'])
+mat2mnc(abs(im_res),['/home/asalerno/Desktop/10.23.15/data_shared_close.mnc'])
