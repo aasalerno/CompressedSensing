@@ -16,8 +16,8 @@ XFMtdx = zeros(size(x));
 for kk = 1:size(x,3)
     %x1 = squeeze(x(:,:,kk));
     %dx1 = squeeze(dx(:,:,kk));
-    FTXFMtx(:,:,kk) = fft2c(params.XFM'*x(:,:,kk));
-    FTXFMtdx(:,:,kk) = fft2c(params.XFM'*dx(:,:,kk));
+    FTXFMtx(:,:,kk) = params.FT{kk}*(params.XFM'*x(:,:,kk));
+    FTXFMtdx(:,:,kk) = params.FT{kk}*(params.XFM'*dx(:,:,kk));
 end
 
 

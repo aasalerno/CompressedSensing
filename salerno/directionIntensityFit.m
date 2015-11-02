@@ -34,7 +34,7 @@ end
 % Give us the required left side to make the proper term for beta
 % Irq = A*B
 % A' * Irq = A' * A * B
-% (A' * A)^-1 * A' * Irq = 
+% (A' * A)^-1 * A' * Irq = B
 
 Aleft = (A'*A)\A';
 beta = zeros([size(Iq) 3]);

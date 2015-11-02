@@ -1,9 +1,10 @@
 function samp = genSamplingDir(imSize,pctg,cyl,radius,nmins,endSize,engfile)
-
-% -----------------------------------------------
 % Figure out how the vectors are going to work -- what combinations should
 % be used
 %
+%
+% This is the function that cdoes all of the combinations from 1:nDirs in
+% our datatset
 if nargin < 5
     nmins = 5;
 end

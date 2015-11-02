@@ -1,4 +1,4 @@
-function  res = TVOP(Aleft)
+function  res = TVOP()
 
 %res = TVOP()
 %
@@ -6,9 +6,11 @@ function  res = TVOP(Aleft)
 %
 % (c) Michael Lustig 2007
 
-if nargin >= 1
-    res.Aleft = Aleft;
-end
+% if nargin >= 1
+%     res.Aleft = dirInfo.Aleft;
+%     res.inds = dirInfo.inds;
+%     res.r = dirInfo.r;
+% end
 
 res.adjoint = 0;
 res = class(res,'TVOP');

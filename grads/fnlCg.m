@@ -19,12 +19,6 @@ function x = fnlCg(x,params)
 % (c) Michael Lustig 2007
 %-------------------------------------------------------------------------
 
-persistent cntX
-
-if isempty(cntX)
-    cntX = 0;
-end
-
 % line search parameters
 maxlsiter = params.lineSearchItnlim ;
 gradToll = params.gradToll ;
